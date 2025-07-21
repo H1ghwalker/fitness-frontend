@@ -1,17 +1,19 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./styles/globals.css";
 import "./styles/animations.css";
 import { Toaster } from "react-hot-toast";
 
-const inter = Inter({
+const poppins = Poppins({
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
   display: 'swap',
+  variable: '--font-poppins',
 });
 
 export const metadata: Metadata = {
-  title: "Fitness App",
-  description: "Manage your fitness clients and sessions",
+  title: "TrainerHub - Transform Your Training Business",
+  description: "The all-in-one platform for personal trainers to manage clients, schedule sessions, and track progress with ease.",
 };
 
 export default function RootLayout({
@@ -20,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.className}>
+    <html lang="en" className={poppins.className}>
       <body>
         {children}
         <Toaster position="top-right" />
