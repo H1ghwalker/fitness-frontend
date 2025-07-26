@@ -36,20 +36,20 @@ export default function HomePage() {
 
   const faqData = [
     {
-      question: "How much does TrainerHub cost?",
-      answer: "TrainerHub offers a free plan for individual trainers with basic features. Premium plans start at $29/month with advanced features like unlimited clients, detailed analytics, and priority support."
-    },
-    {
-      question: "Can I import my existing client data?",
-      answer: "Yes! TrainerHub supports CSV imports for client data, workout templates, and progress tracking. Our team can also help with bulk data migration."
+      question: "What features does TrainerHub offer?",
+      answer: "TrainerHub provides client management, workout template creation, session scheduling, and progress tracking. You can manage your clients, create workout templates, schedule sessions, and track client progress all in one platform."
     },
     {
       question: "Is TrainerHub available on mobile devices?",
-      answer: "Absolutely! TrainerHub is fully responsive and works perfectly on all devices - smartphones, tablets, and desktops. You can manage your business from anywhere."
+      answer: "Yes! TrainerHub is fully responsive and works perfectly on all devices - smartphones, tablets, and desktops. You can manage your business from anywhere."
     },
     {
-      question: "How secure is my client data?",
-      answer: "We take security seriously. All data is encrypted, we're GDPR compliant, and we use industry-standard security practices to protect your information."
+      question: "How do I get started with TrainerHub?",
+      answer: "Simply sign up for a free account, add your clients, create workout templates, and start scheduling sessions. The interface is intuitive and easy to use."
+    },
+    {
+      question: "Can I track my clients' progress?",
+      answer: "Yes, TrainerHub includes progress tracking features that allow you to monitor your clients' fitness goals, measurements, and session attendance."
     }
   ];
 
@@ -217,34 +217,34 @@ export default function HomePage() {
                 </div>
                 <h3 className="text-lg md:text-xl font-semibold text-primary mb-2">Client Management</h3>
                 <p className="text-secondary text-sm md:text-base leading-relaxed">
-                  Organize client data, track progress, manage subscriptions effortlessly.
+                  Manage your clients, their profiles, and contact information in one place.
                 </p>
               </div>
               <div className="bg-white rounded-xl shadow-sm p-6 text-center hover:shadow-md transition-all duration-300 transform hover:scale-105 animate-fade-in-up">
                 <div className="w-12 h-12 md:w-16 md:h-16 bg-main/10 rounded-full flex items-center justify-center mx-auto mb-4 animate-float">
-                  <Dumbbell className="h-6 w-6 md:h-8 md:w-8 text-main" aria-label="Workout Builder Icon" />
+                  <Dumbbell className="h-6 w-6 md:h-8 md:w-8 text-main" aria-label="Workout Templates Icon" />
                 </div>
-                <h3 className="text-lg md:text-xl font-semibold text-primary mb-2">Workout Builder</h3>
+                <h3 className="text-lg md:text-xl font-semibold text-primary mb-2">Workout Templates</h3>
                 <p className="text-secondary text-sm md:text-base leading-relaxed">
-                  Create customized workout plans with intuitive drag and drop interface.
+                  Create and manage workout templates for different training programs.
                 </p>
               </div>
               <div className="bg-white rounded-xl shadow-sm p-6 text-center hover:shadow-md transition-all duration-300 transform hover:scale-105 animate-fade-in-up">
                 <div className="w-12 h-12 md:w-16 md:h-16 bg-main/10 rounded-full flex items-center justify-center mx-auto mb-4 animate-float">
-                  <Calendar className="h-6 w-6 md:h-8 md:w-8 text-main" aria-label="Smart Scheduling Icon" />
+                  <Calendar className="h-6 w-6 md:h-8 md:w-8 text-main" aria-label="Session Scheduling Icon" />
                 </div>
-                <h3 className="text-lg md:text-xl font-semibold text-primary mb-2">Smart Scheduling</h3>
+                <h3 className="text-lg md:text-xl font-semibold text-primary mb-2">Session Scheduling</h3>
                 <p className="text-secondary text-sm md:text-base leading-relaxed">
-                  Effortlessly schedule sessions, reduce bookings, and reschedule conflicts.
+                  Schedule training sessions and manage your calendar efficiently.
                 </p>
               </div>
               <div className="bg-white rounded-xl shadow-sm p-6 text-center hover:shadow-md transition-all duration-300 transform hover:scale-105 animate-fade-in-up">
                 <div className="w-12 h-12 md:w-16 md:h-16 bg-main/10 rounded-full flex items-center justify-center mx-auto mb-4 animate-float">
-                  <Dumbbell className="h-6 w-6 md:h-8 md:w-8 text-main" aria-label="Progress Tracking Icon" />
+                  <TrendingUp className="h-6 w-6 md:h-8 md:w-8 text-main" aria-label="Progress Tracking Icon" />
                 </div>
                 <h3 className="text-lg md:text-xl font-semibold text-primary mb-2">Progress Tracking</h3>
                 <p className="text-secondary text-sm md:text-base leading-relaxed">
-                  Track client progress with detailed analytics and beautiful charts.
+                  Track your clients' progress with measurements and goal tracking.
                 </p>
               </div>
             </div>
