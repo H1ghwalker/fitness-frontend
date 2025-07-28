@@ -31,31 +31,52 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const endpoint = isLogin ? '/login' : '/register';
 
     try {
+      console.log('Attempting auth request to:', `${process.env.NEXT_PUBLIC_API_URL}/api/auth${endpoint}`);
+      console.log('Request data:', { ...formData, password: '[HIDDEN]' });
+      
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth${endpoint}`, {
         method: 'POST',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
         body: JSON.stringify(formData),
       });
 
+      console.log('Response status:', res.status);
+      console.log('Response headers:', Object.fromEntries(res.headers.entries()));
+
       if (res.ok) {
         const user = await res.json();
+        console.log('Auth successful:', user);
         onClose();
         router.push(user.role === 'Trainer' ? '/clients' : '/dashboard');
       } else {
-        const errorData = await res.json().catch(() => null);
+        const errorData = await res.json().catch(() => ({ message: 'Unknown error' }));
         console.log('Server error response:', errorData);
+        
         if (errorData?.message === 'User already exists') {
           setEmailError('This email is already registered');
           toast.error('This email is already registered. Please use another email or sign in.');
+        } else if (errorData?.message) {
+          toast.error(`Authentication error: ${errorData.message}`);
         } else {
           console.log('Error data structure:', JSON.stringify(errorData, null, 2));
-          toast.error('Error during login or registration');
+          toast.error(`Authentication failed (${res.status}). Please try again.`);
         }
       }
     } catch (error) {
       console.error('Auth error:', error);
-      toast.error('An error occurred during authentication');
+      
+      // Более детальная обработка ошибок для мобильных устройств
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        toast.error('Network error. Please check your internet connection and try again.');
+      } else if (error instanceof Error) {
+        toast.error(`Connection error: ${error.message}`);
+      } else {
+        toast.error('An unexpected error occurred during authentication');
+      }
     } finally {
       setLoading(false);
     }
