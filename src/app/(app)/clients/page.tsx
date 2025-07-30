@@ -228,11 +228,11 @@ export default function ClientsPage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4 sm:mb-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#1F2A44] mb-1">Clients</h1>
-            <p className="text-sm text-[#6B7280]">Manage your client list and details</p>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F2A44] mb-1">Clients</h1>
+            <p className="text-xs sm:text-sm text-[#6B7280]">Manage your client list and details</p>
           </div>
           <Button
             type="button"
@@ -240,22 +240,22 @@ export default function ClientsPage() {
             variant="success"
             onClick={() => setIsOpen(true)}
           >
-            <Plus className="h-5 w-5" />
+            <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
             Add New Client
           </Button>
         </div>
 
         {/* Поиск и фильтры */}
-        <div className="flex flex-col gap-3 mb-6">
+        <div className="flex flex-col gap-3 mb-4 sm:mb-6">
           <div className="relative flex-1">
             <Input
               type="text"
               placeholder="Search clients..."
               value={searchQuery}
               onChange={handleSearchChange}
-              className="pl-10"
+              className="pl-8 sm:pl-10"
             />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#6B7280]" />
+            <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-[#6B7280]" />
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -263,15 +263,15 @@ export default function ClientsPage() {
               <button
                 key={type}
                 onClick={() => handleFilterChange(type)}
-                className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg cursor-pointer transition-colors text-sm sm:text-base ${
+                className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg cursor-pointer transition-colors text-xs sm:text-sm md:text-base ${
                   filter === type
                     ? 'bg-[#8B5CF6] text-white hover:bg-[#7c3aed]'
                     : 'bg-gray-200 text-[#1F2A44] hover:bg-gray-300'
                 }`}
               >
-                {type === 'All' && <Users className="h-4 w-4 sm:h-5 sm:w-5" />}
-                {type === 'Subscription' && <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />}
-                {type === 'Single Session' && <Dumbbell className="h-4 w-4 sm:h-5 sm:w-5" />}
+                {type === 'All' && <Users className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />}
+                {type === 'Subscription' && <Calendar className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />}
+                {type === 'Single Session' && <Dumbbell className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />}
                 <span className="hidden sm:inline">{type}</span>
                 <span className="sm:hidden">
                   {type === 'All' ? 'All' : type === 'Subscription' ? 'Sub' : 'Single'}
@@ -280,17 +280,17 @@ export default function ClientsPage() {
             ))}
             <button
               onClick={handleResetFilters}
-              className="p-2 bg-gray-200 text-[#1F2A44] rounded-lg cursor-pointer hover:bg-gray-300 transition-colors"
+              className="p-1.5 sm:p-2 bg-gray-200 text-[#1F2A44] rounded-lg cursor-pointer hover:bg-gray-300 transition-colors"
             >
-              <Filter className="h-4 w-4 sm:h-5 sm:w-5" />
+              <Filter className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
             </button>
           </div>
         </div>
 
         {/* Отображение ошибки */}
         {error && (
-          <div className="text-center py-6">
-            <div className="text-red-600 mb-4">{error}</div>
+          <div className="text-center py-4 sm:py-6">
+            <div className="text-red-600 mb-3 sm:mb-4 text-sm sm:text-base">{error}</div>
             <Button 
               onClick={fetchClients}
               className="bg-blue-600 hover:bg-blue-700"
@@ -302,14 +302,14 @@ export default function ClientsPage() {
 
         <div className="space-y-3">
           {!error && filteredClients.length === 0 ? (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Users className="h-8 w-8 text-gray-400" />
+            <div className="text-center py-6 sm:py-8">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Users className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">
                 {searchQuery || filter !== 'All' ? 'No clients found' : 'No clients yet'}
               </h3>
-              <p className="text-gray-500 mb-4">
+              <p className="text-gray-500 mb-3 sm:mb-4 text-sm sm:text-base">
                 {searchQuery || filter !== 'All' 
                   ? 'Try adjusting your search or filter criteria'
                   : 'Get started by adding your first client'
@@ -318,23 +318,20 @@ export default function ClientsPage() {
               {!searchQuery && filter === 'All' && (
                 <Button
                   onClick={() => setIsOpen(true)}
-                  variant="success"
-                  className="flex items-center gap-2 mx-auto"
+                  className="bg-[#10B981] hover:bg-[#059669]"
                 >
-                  <Plus className="h-5 w-5" />
                   Add Your First Client
                 </Button>
               )}
             </div>
           ) : (
-            !error && filteredClients.map(client => (
+            filteredClients.map((client) => (
               <ClientCard
                 key={client.id}
                 client={client}
-                onDelete={handleDeleteClient}
                 onEdit={() => handleEdit(client.id)}
+                onDelete={() => handleDeleteClient(client.id, client.User?.name || 'Unknown')}
                 onProgress={() => handleProgress(client.id)}
-                onClick={() => router.push(`/clients/${client.id}`)}
               />
             ))
           )}

@@ -41,6 +41,38 @@
 body {
   background: var(--background-white);
 }
+
+/* Mobile-specific improvements */
+@media (max-width: 640px) {
+  /* Улучшенные отступы для мобильных устройств */
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  
+  /* Уменьшенные размеры текста для мобильных */
+  h1 {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+  
+  /* Улучшенные кнопки для мобильных */
+  button {
+    min-height: 2.5rem;
+    padding: 0.5rem 1rem;
+  }
+  
+  /* Улучшенные формы для мобильных */
+  input, select, textarea {
+    font-size: 16px; /* Предотвращает зум на iOS */
+  }
+}
+
 /* Main color utilities */
 .text-main {
   color: var(--main);

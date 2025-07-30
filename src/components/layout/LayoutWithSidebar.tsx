@@ -15,7 +15,7 @@ export default function LayoutWithSidebar({ children }: { children: React.ReactN
       <div className="flex h-screen">
         <Sidebar />
         <div className={`flex flex-col flex-1 transition-all duration-300 ${collapsed ? 'lg:ml-20' : 'lg:ml-64'} ml-0`}>
-          <main className="flex-1 overflow-y-auto bg-gray-50 animate-page-transition">
+          <main className="flex-1 overflow-y-auto bg-gray-50 animate-page-transition pt-12 sm:pt-0">
             {children}
           </main>
         </div>

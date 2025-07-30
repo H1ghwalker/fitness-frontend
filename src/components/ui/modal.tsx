@@ -66,20 +66,20 @@ export function Modal({ isOpen, onClose, title, children, size = 'lg' }: ModalPr
       onMouseUp={handleBackdropMouseUp}
     >
       <div
-        className={`relative w-full sm:w-auto min-w-[22rem] ${sizeClass} bg-white rounded-lg shadow-xl transform transition-all duration-300 ${
+        className={`relative w-[95%] sm:w-auto sm:min-w-[22rem] ${sizeClass} bg-white rounded-lg shadow-xl transform transition-all duration-300 ${
           closing || !mounted ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
-        } p-8 max-h-[90vh] overflow-y-auto`}
+        } p-4 sm:p-6 md:p-8 max-h-[85vh] sm:max-h-[90vh] overflow-y-auto mx-4`}
         onMouseDown={(e) => e.stopPropagation()}
       >
         <button
           onClick={handleClose}
-          className="absolute top-3 right-4 text-gray-400 hover:text-gray-600 text-2xl transition-colors"
+          className="absolute top-2 right-3 sm:top-3 sm:right-4 text-gray-400 hover:text-gray-600 text-xl sm:text-2xl transition-colors p-1"
         >
           &times;
         </button>
 
         {title && (
-          <h2 className="text-2xl font-semibold text-center mb-6 text-primary">
+          <h2 className="text-xl sm:text-2xl font-semibold text-center mb-4 sm:mb-6 text-primary pr-8">
             {title}
           </h2>
         )}

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Modal } from '@/components/ui/modal';
 import toast from 'react-hot-toast';
+import { isMobileDevice, safeRedirect } from '@/lib/utils';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -51,7 +52,17 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         const user = await res.json();
         console.log('Auth successful:', user);
         onClose();
-        router.push(user.role === 'Trainer' ? '/clients' : '/dashboard');
+        
+        const targetPath = user.role === 'Trainer' ? '/clients' : '/dashboard';
+        
+        // Дополнительное логирование для мобильных устройств
+        if (isMobileDevice()) {
+          console.log('Mobile device detected, using enhanced redirect logic');
+          console.log('Cookies in document:', document.cookie);
+        }
+        
+        // Используем безопасный редирект для мобильных устройств
+        await safeRedirect(router, targetPath);
       } else {
         const errorData = await res.json().catch(() => ({ message: 'Unknown error' }));
         console.log('Server error response:', errorData);
