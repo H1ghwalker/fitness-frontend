@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { checkAuthWithRetry } from '@/lib/utils';
+import { checkAuthWithRetry, checkAuthForIOS, forceRedirectForIOS, reliableIOSRedirect } from '@/lib/utils';
 
 interface AuthRedirectProps {
   children: React.ReactNode;
@@ -17,12 +17,22 @@ export default function AuthRedirect({ children }: AuthRedirectProps) {
     const checkAuth = async () => {
       try {
         console.log('Checking authentication...');
-        const isAuthenticated = await checkAuthWithRetry(3, 500);
+        
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const maxRetries = isIOS ? 5 : 3;
+        const delay = isIOS ? 1000 : 500;
+        
+        console.log('AuthRedirect: iOS device detected:', isIOS);
+        const isAuthenticated = isIOS ? await checkAuthForIOS() : await checkAuthWithRetry(maxRetries, delay);
         
         if (isAuthenticated) {
           // Пользователь авторизован - редиректим на /clients
           console.log('User is authenticated, redirecting to /clients');
-          router.push('/clients');
+          if (isIOS) {
+            await reliableIOSRedirect(router, '/clients');
+          } else {
+            router.push('/clients');
+          }
         } else {
           // Пользователь не авторизован - показываем содержимое
           console.log('User is not authenticated, showing content');

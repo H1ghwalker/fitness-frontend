@@ -6,7 +6,7 @@ import AuthModal from "@/components/auth/AuthModal";
 import { Button } from "@/components/ui/button";
 import { Dumbbell, Users, Calendar, MessageCircle, ArrowUp, Star, Play, CheckCircle, TrendingUp, Clock, Award, Zap, ChevronDown, ChevronUp } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { isMobileDevice, checkAuthWithRetry } from "@/lib/utils";
+import { isMobileDevice, checkAuthWithRetry, checkAuthForIOS, forceRedirectForIOS, reliableIOSRedirect } from "@/lib/utils";
 
 export default function HomePage() {
   const [showModal, setShowModal] = useState(false);
@@ -34,11 +34,21 @@ export default function HomePage() {
       if (isMobileDevice()) {
         try {
           console.log('HomePage: Additional auth check for mobile devices');
-          const isAuthenticated = await checkAuthWithRetry(2, 300);
+          
+          const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+          const maxRetries = isIOS ? 4 : 2;
+          const delay = isIOS ? 800 : 300;
+          
+          console.log('HomePage: iOS device detected:', isIOS);
+          const isAuthenticated = isIOS ? await checkAuthForIOS() : await checkAuthWithRetry(maxRetries, delay);
           
           if (isAuthenticated) {
             console.log('HomePage: User is authenticated, redirecting to /clients');
-            router.push('/clients');
+            if (isIOS) {
+              await reliableIOSRedirect(router, '/clients');
+            } else {
+              router.push('/clients');
+            }
           }
         } catch (error) {
           console.log('HomePage: Auth check failed:', error);

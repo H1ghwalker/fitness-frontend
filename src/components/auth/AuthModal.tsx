@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Modal } from '@/components/ui/modal';
 import toast from 'react-hot-toast';
-import { isMobileDevice, safeRedirect } from '@/lib/utils';
+import { isMobileDevice, safeRedirect, checkAuthForIOS, forceRedirectForIOS, checkCookiesForIOS, reliableIOSRedirect } from '@/lib/utils';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -59,10 +59,40 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         if (isMobileDevice()) {
           console.log('Mobile device detected, using enhanced redirect logic');
           console.log('Cookies in document:', document.cookie);
+          
+          // Для iOS добавляем дополнительную задержку перед редиректом
+          const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+          const isIOSFromBackend = user.isIOS;
+          
+          console.log('iOS detected from frontend:', isIOS);
+          console.log('iOS detected from backend:', isIOSFromBackend);
+          
+          if (isIOS || isIOSFromBackend) {
+            console.log('iOS device detected, adding extra delay for cookie processing');
+            // Даем время cookie установиться
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Проверяем состояние cookies
+            const cookiesOk = checkCookiesForIOS();
+            console.log('iOS cookies check:', cookiesOk);
+            
+            // Дополнительная проверка авторизации для iOS
+            console.log('Performing additional auth check for iOS');
+            const isAuthenticated = await checkAuthForIOS();
+            console.log('iOS auth check result:', isAuthenticated);
+          }
         }
         
         // Используем безопасный редирект для мобильных устройств
-        await safeRedirect(router, targetPath);
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const isIOSFromBackend = user.isIOS;
+        
+        if (isIOS || isIOSFromBackend) {
+          console.log('Using reliable redirect for iOS device');
+          await reliableIOSRedirect(router, targetPath);
+        } else {
+          await safeRedirect(router, targetPath);
+        }
       } else {
         const errorData = await res.json().catch(() => ({ message: 'Unknown error' }));
         console.log('Server error response:', errorData);

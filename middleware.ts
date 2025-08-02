@@ -11,6 +11,16 @@ export async function middleware(request: NextRequest) {
       console.log('Middleware: User agent:', request.headers.get('user-agent'));
       console.log('Middleware: Cookies:', request.headers.get('cookie'));
       
+      const userAgent = request.headers.get('user-agent') || '';
+      const isIOS = /iPhone|iPad|iPod/i.test(userAgent);
+      
+      if (isIOS) {
+        console.log('Middleware: iOS device detected, using enhanced auth check');
+        
+        // Для iOS добавляем дополнительную задержку перед проверкой
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      
       // Проверяем авторизацию через API
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
         headers: {
@@ -27,6 +37,23 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/clients', request.url))
       } else {
         console.log('Middleware: User is not authenticated, showing homepage');
+        
+        // Для iOS добавляем дополнительную проверку через задержку
+        if (isIOS) {
+          console.log('Middleware: iOS device - performing delayed auth check');
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          const delayedResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
+            headers: {
+              cookie: request.headers.get('cookie') || '',
+            },
+          });
+          
+          if (delayedResponse.ok) {
+            console.log('Middleware: iOS delayed auth check successful, redirecting to /clients');
+            return NextResponse.redirect(new URL('/clients', request.url))
+          }
+        }
       }
     } catch (error) {
       // Если ошибка сети или API недоступен - показываем главную страницу
