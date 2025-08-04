@@ -13,16 +13,12 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          console.log('Missing credentials')
           return null
         }
 
         try {
           const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337'
           const endpoint = credentials.name ? '/jwt' : '/jwt'
-          
-          console.log('Making auth request to:', `${apiUrl}/api/auth${endpoint}`)
-          console.log('Credentials:', { email: credentials.email, name: credentials.name, role: credentials.role })
           
           const res = await fetch(`${apiUrl}/api/auth${endpoint}`, {
             method: 'POST',
@@ -37,11 +33,8 @@ export const authOptions: NextAuthOptions = {
             }),
           })
 
-          console.log('Auth response status:', res.status)
-
           if (res.ok) {
             const user = await res.json()
-            console.log('Auth successful, user:', user)
             return {
               id: user.id.toString(),
               email: user.email,
@@ -49,9 +42,6 @@ export const authOptions: NextAuthOptions = {
               role: user.role,
               accessToken: user.accessToken,
             }
-          } else {
-            const errorText = await res.text()
-            console.log('Auth failed:', errorText)
           }
           
           return null
@@ -64,7 +54,6 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user }) {
-      console.log('JWT callback - user:', user, 'token:', token)
       if (user) {
         token.role = user.role
         token.accessToken = user.accessToken
@@ -72,7 +61,6 @@ export const authOptions: NextAuthOptions = {
       return token
     },
     async session({ session, token }) {
-      console.log('Session callback - token:', token, 'session:', session)
       if (token) {
         session.user.role = token.role
         session.user.id = token.id

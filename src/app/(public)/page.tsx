@@ -1,31 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useSession } from "next-auth/react";
 import NextAuthModal from "@/components/auth/NextAuthModal";
 import { Button } from "@/components/ui/button";
 import { Dumbbell, Users, Calendar, MessageCircle, ArrowUp, Star, Play, CheckCircle, TrendingUp, Clock, Award, Zap, ChevronDown, ChevronUp } from "lucide-react";
 
 export default function HomePage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { data: session, status } = useSession();
   const [showModal, setShowModal] = useState(false);
   const [isArrowVisible, setIsArrowVisible] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-
-  // Обработка callback URL после успешной аутентификации
-  useEffect(() => {
-    if (status === 'authenticated' && session) {
-      const callbackUrl = searchParams.get('callbackUrl');
-      if (callbackUrl && callbackUrl.startsWith('/')) {
-        console.log('Redirecting authenticated user to:', callbackUrl);
-        router.replace(callbackUrl);
-      }
-    }
-  }, [session, status, searchParams, router]);
 
   useEffect(() => {
     const handleScroll = () => {

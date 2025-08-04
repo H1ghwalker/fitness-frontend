@@ -33,27 +33,21 @@ export default function NextAuthModal({ isOpen, onClose }: NextAuthModalProps) {
     try {
       if (isLogin) {
         // Вход через NextAuth
-        console.log('Attempting login with:', { email: formData.email });
         const result = await signIn('credentials', {
           email: formData.email,
           password: formData.password,
           redirect: false,
         });
 
-        console.log('Login result:', result);
         if (result?.error) {
           toast.error('Invalid credentials. Please try again.');
         } else if (result?.ok) {
           onClose();
           toast.success('Login successful! Redirecting...');
-          // Добавляем небольшую задержку для обновления сессии
-          setTimeout(() => {
-            router.push('/clients');
-          }, 1000);
+          router.push('/clients');
         }
       } else {
         // Регистрация через NextAuth
-        console.log('Attempting registration with:', { email: formData.email, name: formData.name, role: formData.role });
         const result = await signIn('credentials', {
           email: formData.email,
           password: formData.password,
@@ -62,7 +56,6 @@ export default function NextAuthModal({ isOpen, onClose }: NextAuthModalProps) {
           redirect: false,
         });
 
-        console.log('Registration result:', result);
         if (result?.error) {
           if (result.error.includes('already exists')) {
             setEmailError('This email is already registered');
@@ -74,10 +67,7 @@ export default function NextAuthModal({ isOpen, onClose }: NextAuthModalProps) {
           onClose();
           toast.success('Registration successful! Redirecting...');
           const targetPath = formData.role === 'Trainer' ? '/clients' : '/dashboard';
-          // Добавляем небольшую задержку для обновления сессии
-          setTimeout(() => {
-            router.push(targetPath);
-          }, 1000);
+          router.push(targetPath);
         }
       }
     } catch (error) {
