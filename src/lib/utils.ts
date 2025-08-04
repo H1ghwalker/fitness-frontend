@@ -5,69 +5,44 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-// Утилита для определения мобильных устройств
+// Простая проверка iOS устройств
+export const isIOSDevice = () => {
+  if (typeof window === 'undefined') return false;
+  return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+};
+
+// Простая проверка мобильных устройств
 export const isMobileDevice = () => {
   if (typeof window === 'undefined') return false;
   return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 };
 
-// Утилита для проверки авторизации с повторными попытками
-export const checkAuthWithRetry = async (maxRetries = 3, delay = 500): Promise<boolean> => {
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
-        credentials: 'include',
-      });
-      
-      if (res.ok) {
-        return true;
-      }
-      
-      // Если это не последняя попытка, ждем перед следующей
-      if (i < maxRetries - 1) {
-        await new Promise(resolve => setTimeout(resolve, delay));
-      }
-    } catch (error) {
-      console.log(`Auth check attempt ${i + 1} failed:`, error);
-      
-      // Если это не последняя попытка, ждем перед следующей
-      if (i < maxRetries - 1) {
-        await new Promise(resolve => setTimeout(resolve, delay));
-      }
-    }
+// Простая проверка авторизации
+export const checkAuth = async (): Promise<boolean> => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
+      credentials: 'include',
+    });
+    return res.ok;
+  } catch (error) {
+    console.log('Auth check failed:', error);
+    return false;
   }
-  
-  return false;
 };
 
-// Утилита для безопасного редиректа с проверкой авторизации
-export const safeRedirect = async (router: any, targetPath: string) => {
-  const isMobile = isMobileDevice();
+// Простой редирект с поддержкой iOS
+export const redirectForIOS = (router: any, targetPath: string) => {
+  const isIOS = isIOSDevice();
   
-  console.log('safeRedirect called for path:', targetPath);
-  console.log('Is mobile device:', isMobile);
+  console.log('Redirect for iOS:', isIOS, 'Target:', targetPath);
   
-  if (isMobile) {
-    // Для мобильных устройств проверяем авторизацию перед редиректом
-    console.log('Checking authentication for mobile device...');
-    const isAuthenticated = await checkAuthWithRetry();
-    
-    console.log('Authentication result:', isAuthenticated);
-    console.log('Current cookies:', document.cookie);
-    
-    if (isAuthenticated) {
-      console.log('User is authenticated, proceeding with redirect');
-      router.push(targetPath);
-    } else {
-      console.log('User is not authenticated, but proceeding with redirect anyway');
-      // Добавляем небольшую задержку для мобильных устройств
-      setTimeout(() => {
-        router.push(targetPath);
-      }, 500);
-    }
+  if (isIOS) {
+    // Для iOS используем window.location.href
+    console.log('iOS device detected, using window.location');
+    window.location.href = targetPath;
   } else {
-    // Для десктопа сразу редиректим
-    console.log('Desktop device, immediate redirect');
+    // Для остальных устройств используем router.push
+    console.log('Desktop device, using router.push');
     router.push(targetPath);
   }
 };

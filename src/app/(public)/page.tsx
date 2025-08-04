@@ -5,15 +5,12 @@ import AuthRedirect from "@/components/auth/AuthRedirect";
 import AuthModal from "@/components/auth/AuthModal";
 import { Button } from "@/components/ui/button";
 import { Dumbbell, Users, Calendar, MessageCircle, ArrowUp, Star, Play, CheckCircle, TrendingUp, Clock, Award, Zap, ChevronDown, ChevronUp } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { isMobileDevice, checkAuthWithRetry } from "@/lib/utils";
 
 export default function HomePage() {
   const [showModal, setShowModal] = useState(false);
   const [isArrowVisible, setIsArrowVisible] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,29 +24,6 @@ export default function HomePage() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  // Дополнительная проверка авторизации для мобильных устройств
-  useEffect(() => {
-    const checkAuthOnMount = async () => {
-      if (isMobileDevice()) {
-        try {
-          console.log('HomePage: Additional auth check for mobile devices');
-          const isAuthenticated = await checkAuthWithRetry(2, 300);
-          
-          if (isAuthenticated) {
-            console.log('HomePage: User is authenticated, redirecting to /clients');
-            router.push('/clients');
-          }
-        } catch (error) {
-          console.log('HomePage: Auth check failed:', error);
-        }
-      }
-    };
-
-    // Проверяем через небольшую задержку, чтобы дать время middleware
-    const timer = setTimeout(checkAuthOnMount, 100);
-    return () => clearTimeout(timer);
-  }, [router]);
 
   const scrollToHero = () => {
     const heroSection = document.getElementById("hero-section");

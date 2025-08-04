@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Modal } from '@/components/ui/modal';
 import toast from 'react-hot-toast';
-import { isMobileDevice, safeRedirect } from '@/lib/utils';
+import { redirectForIOS } from '@/lib/utils';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -33,7 +33,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
     try {
       console.log('Attempting auth request to:', `${process.env.NEXT_PUBLIC_API_URL}/api/auth${endpoint}`);
-      console.log('Request data:', { ...formData, password: '[HIDDEN]' });
       
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth${endpoint}`, {
         method: 'POST',
@@ -46,7 +45,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       });
 
       console.log('Response status:', res.status);
-      console.log('Response headers:', Object.fromEntries(res.headers.entries()));
 
       if (res.ok) {
         const user = await res.json();
@@ -55,14 +53,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         
         const targetPath = user.role === 'Trainer' ? '/clients' : '/dashboard';
         
-        // Дополнительное логирование для мобильных устройств
-        if (isMobileDevice()) {
-          console.log('Mobile device detected, using enhanced redirect logic');
-          console.log('Cookies in document:', document.cookie);
-        }
-        
-        // Используем безопасный редирект для мобильных устройств
-        await safeRedirect(router, targetPath);
+        // Простой редирект с поддержкой iOS
+        redirectForIOS(router, targetPath);
       } else {
         const errorData = await res.json().catch(() => ({ message: 'Unknown error' }));
         console.log('Server error response:', errorData);
@@ -73,21 +65,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         } else if (errorData?.message) {
           toast.error(`Authentication error: ${errorData.message}`);
         } else {
-          console.log('Error data structure:', JSON.stringify(errorData, null, 2));
           toast.error(`Authentication failed (${res.status}). Please try again.`);
         }
       }
     } catch (error) {
       console.error('Auth error:', error);
-      
-      // Более детальная обработка ошибок для мобильных устройств
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        toast.error('Network error. Please check your internet connection and try again.');
-      } else if (error instanceof Error) {
-        toast.error(`Connection error: ${error.message}`);
-      } else {
-        toast.error('An unexpected error occurred during authentication');
-      }
+      toast.error('Network error. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
