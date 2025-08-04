@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getClientById, updateClient } from "@/lib/api";
+import { useApi } from "@/hooks/useApi";
 import { Client } from "@/types/types";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,7 @@ type Props = {
 };
 
 export default function EditClientModal({ clientId, onClose, onUpdated }: Props) {
+  const { makeRequest } = useApi();
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
@@ -30,7 +31,7 @@ export default function EditClientModal({ clientId, onClose, onUpdated }: Props)
     const fetchClient = async () => {
       try {
         console.log('Fetching client with ID:', clientId);
-        const data = await getClientById(clientId);
+        const data = await makeRequest(`clients/${clientId}`);
         console.log('Client data received:', data);
         setFormData({
           name: data.User?.name || '',
@@ -44,12 +45,16 @@ export default function EditClientModal({ clientId, onClose, onUpdated }: Props)
           clientId,
           error: error instanceof Error ? error.message : error
         });
+        // Если ошибка 401, закрываем модальное окно
+        if (error instanceof Error && error.message.includes('401')) {
+          onClose();
+        }
       } finally {
         setLoading(false);
       }
     };
     fetchClient();
-  }, [clientId]);
+  }, [clientId, makeRequest]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData((prev) => ({
@@ -69,7 +74,10 @@ export default function EditClientModal({ clientId, onClose, onUpdated }: Props)
         phone: formData.phone,
         plan: formData.plan,
       };
-      const updatedClient = await updateClient(clientId, updateData);
+      const updatedClient = await makeRequest(`clients/${clientId}`, {
+        method: 'PUT',
+        body: JSON.stringify(updateData),
+      });
       onUpdated?.(updatedClient);
       onClose();
       toast.success('Client updated successfully');

@@ -6,13 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Session } from '@/types/types';
 import { useCalendar } from '@/hooks/useCalendar';
 import { useSessions } from '@/hooks/useSessions';
-import { createBulkSessions } from '@/lib/api';
+import { useApi } from '@/hooks/useApi';
 import CalendarGrid from './CalendarGrid';
 import SessionsList from './SessionsList';
 import AddSessionModal from './AddSessionModal';
 import SessionDetailsModal from './SessionDetailsModal';
 
 export default function CalendarPage() {
+  const { makeRequest } = useApi();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
 
@@ -63,13 +64,16 @@ export default function CalendarPage() {
   // Обработчик создания повторяющихся сессий
   const handleCreateRecurringSessions = async (formData: any) => {
     try {
-      const response = await createBulkSessions({
-        clientId: parseInt(formData.clientId),
-        dates: formData.dates,
-        time: formData.time,
-        note: formData.note,
-        duration: formData.duration ? parseInt(formData.duration) : undefined,
-        workoutTemplateId: formData.workoutTemplateId ? parseInt(formData.workoutTemplateId) : undefined,
+      const response = await makeRequest('sessions/bulk-create', {
+        method: 'POST',
+        body: JSON.stringify({
+          clientId: parseInt(formData.clientId),
+          dates: formData.dates,
+          time: formData.time,
+          note: formData.note,
+          duration: formData.duration ? parseInt(formData.duration) : undefined,
+          workoutTemplateId: formData.workoutTemplateId ? parseInt(formData.workoutTemplateId) : undefined,
+        }),
       });
 
       console.log('Created recurring sessions:', response);

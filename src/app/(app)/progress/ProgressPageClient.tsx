@@ -8,7 +8,7 @@ import { GoalProgressCircle } from './GoalProgressCircle';
 import { AddMeasurementModal } from './AddMeasurementModal';
 import { MeasurementsTable } from './MeasurementsTable';
 import { SessionsTable } from './SessionsTable';
-import { getClients, getClientProgressMeasurements, getSessionsByMonth, getClientById, deleteProgressMeasurement } from '@/lib/api';
+import { useApi } from '@/hooks/useApi';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
@@ -22,6 +22,7 @@ const TABS = [
 ];
 
 export default function ProgressPageClient() {
+  const { makeRequest } = useApi();
   const searchParams = useSearchParams();
   const [clients, setClients] = useState<any[]>([]);
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
@@ -105,7 +106,7 @@ export default function ProgressPageClient() {
     const fetchClients = async () => {
       setClientsLoading(true);
       try {
-        const data = await getClients();
+        const data = await makeRequest('clients');
         setClients(data || []);
         
         // Проверяем URL параметры для автоматического выбора клиента
@@ -153,7 +154,7 @@ export default function ProgressPageClient() {
         console.log('👤 Profile measurement:', profileMeasurement);
         
         // 2. Загружаем реальные измерения из БД
-        const res = await getClientProgressMeasurements(selectedClientId);
+        const res = await makeRequest(`progress/${selectedClientId}`);
         console.log('📊 Raw measurements response:', res);
         
         const realMeasurements = res.measurements || [];
@@ -178,7 +179,9 @@ export default function ProgressPageClient() {
         setWeightData(weightDataForChart);
 
         // 5. Загружаем сессии для посещаемости
-        const sessions = await getSessionsByMonth(new Date().getFullYear(), new Date().getMonth() + 1);
+        const sessions = await makeRequest('sessions', { 
+          params: { month: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}` }
+        });
         const clientSessions = sessions.filter(s => s.clientId === selectedClientId);
         setSessions(clientSessions);
         
@@ -194,7 +197,7 @@ export default function ProgressPageClient() {
         setAttendanceData(Object.entries(byMonth).map(([month, v]) => ({ month, ...v })));
 
         // 6. Загружаем целевой вес клиента
-        const client = await getClientById(selectedClientId);
+        const client = await makeRequest(`clients/${selectedClientId}`);
         setClientTargetWeight(client.targetWeight || null);
         
       } catch (error) {
@@ -251,7 +254,7 @@ export default function ProgressPageClient() {
     console.log('🔄 Measurement added, reloading data...');
     // Перезагружаем данные с учётом профильного веса
     if (selectedClientId && selectedClient) {
-      getClientProgressMeasurements(selectedClientId).then(res => {
+      makeRequest(`progress/${selectedClientId}`).then(res => {
         console.log('📊 Reloaded measurements:', res);
         
         // Создаём профильное измерение
@@ -286,7 +289,7 @@ export default function ProgressPageClient() {
     }
 
     try {
-      await deleteProgressMeasurement(id);
+      await makeRequest(`progress/${id}`, { method: 'DELETE' });
       toast.success('Measurement deleted successfully!');
       handleMeasurementAdded(); // Перезагружаем данные
     } catch (error) {

@@ -5,13 +5,14 @@ import { useRouter } from 'next/navigation';
 import { Search, Plus, Dumbbell, Heart, User, Activity, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { getWorkoutTemplates, deleteWorkoutTemplate } from '@/lib/api';
+import { useApi } from '@/hooks/useApi';
 import WorkoutTemplateCard from './WorkoutTemplateCard';
 import EditWorkoutTemplateModal from './EditWorkoutTemplateModal';
 import toast from 'react-hot-toast';
 import { ServerWorkoutTemplate } from '@/types/types';
 
 export default function WorkoutTemplatesPage() {
+  const { makeRequest } = useApi();
   const router = useRouter();
   const [templates, setTemplates] = useState<ServerWorkoutTemplate[]>([]);
   const [filteredTemplates, setFilteredTemplates] = useState<ServerWorkoutTemplate[]>([]);
@@ -27,7 +28,7 @@ export default function WorkoutTemplatesPage() {
 
   const fetchTemplates = async () => {
     try {
-      const data = await getWorkoutTemplates();
+      const data = await makeRequest('workout-templates');
       // Сервер возвращает объект с полем templates
       const templatesArray = data.templates || [];
       setTemplates(templatesArray);
@@ -99,7 +100,7 @@ export default function WorkoutTemplatesPage() {
     }
 
     try {
-      await deleteWorkoutTemplate(templateId);
+      await makeRequest(`workout-templates/${templateId}`, { method: 'DELETE' });
       setTemplates(prev => prev.filter(template => template.id !== templateId));
       setFilteredTemplates(prev => prev.filter(template => template.id !== templateId));
       toast.success('Template deleted successfully');

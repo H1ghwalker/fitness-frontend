@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { X, Plus, Scale, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { createProgressMeasurement } from '@/lib/api';
+import { useApi } from '@/hooks/useApi';
 import toast from 'react-hot-toast';
 
 interface AddMeasurementModalProps {
@@ -22,6 +22,7 @@ export const AddMeasurementModal: React.FC<AddMeasurementModalProps> = ({
   clientName,
   onMeasurementAdded
 }) => {
+  const { makeRequest } = useApi();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
@@ -55,15 +56,18 @@ export const AddMeasurementModal: React.FC<AddMeasurementModalProps> = ({
         notes: formData.notes || undefined
       });
 
-      const result = await createProgressMeasurement({
-        clientId,
-        date: formData.date,
-        weight: formData.weight ? parseFloat(formData.weight) : undefined,
-        chest: formData.chest ? parseFloat(formData.chest) : undefined,
-        waist: formData.waist ? parseFloat(formData.waist) : undefined,
-        hips: formData.hips ? parseFloat(formData.hips) : undefined,
-        biceps: formData.biceps ? parseFloat(formData.biceps) : undefined,
-        notes: formData.notes || undefined
+      const result = await makeRequest('progress', {
+        method: 'POST',
+        body: JSON.stringify({
+          clientId,
+          date: formData.date,
+          weight: formData.weight ? parseFloat(formData.weight) : undefined,
+          chest: formData.chest ? parseFloat(formData.chest) : undefined,
+          waist: formData.waist ? parseFloat(formData.waist) : undefined,
+          hips: formData.hips ? parseFloat(formData.hips) : undefined,
+          biceps: formData.biceps ? parseFloat(formData.biceps) : undefined,
+          notes: formData.notes || undefined
+        }),
       });
 
       console.log('✅ Measurement created successfully:', result);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getClients, getSessionsByMonth } from "@/lib/api";
+import { useApi } from "@/hooks/useApi";
 import { Client, Session } from "@/types/types";
 import { Calendar as CalendarIcon, Users, ArrowUpRight, Plus, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ function getTodayISO() {
 }
 
 export default function DashboardPage() {
+  const { makeRequest } = useApi();
   const [clients, setClients] = useState<Client[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,10 +25,12 @@ export default function DashboardPage() {
     async function fetchData() {
       setLoading(true);
       try {
-        const clientsData = await getClients();
+        const clientsData = await makeRequest('clients');
         setClients(clientsData);
         const now = new Date();
-        const sessionsData = await getSessionsByMonth(now.getFullYear(), now.getMonth() + 1);
+        const sessionsData = await makeRequest('sessions', { 
+          params: { month: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}` }
+        });
         setSessions(sessionsData);
       } catch (e) {
         // handle error
@@ -36,10 +39,10 @@ export default function DashboardPage() {
       }
     }
     fetchData();
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, { credentials: 'include' })
-      .then(res => res.ok ? res.json() : null)
-      .then(data => setTrainerName(data?.name || ""));
-  }, []);
+    makeRequest('auth/me')
+      .then(data => setTrainerName(data?.name || ""))
+      .catch(() => setTrainerName(""));
+  }, [makeRequest]);
 
   const activeClients = clients.length;
   const today = new Date();

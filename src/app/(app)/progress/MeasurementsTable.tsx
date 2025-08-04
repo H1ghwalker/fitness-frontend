@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Calendar, Scale, Trash2, Edit, TrendingUp, TrendingDown, BarChart3 } from 'lucide-react';
-import { deleteProgressMeasurement } from '@/lib/api';
+import { useApi } from '@/hooks/useApi';
 import toast from 'react-hot-toast';
 
 interface Measurement {
@@ -28,6 +28,7 @@ export const MeasurementsTable: React.FC<MeasurementsTableProps> = ({
   onDelete, 
   isLoading = false 
 }) => {
+  const { makeRequest } = useApi();
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const handleDelete = async (id: number) => {

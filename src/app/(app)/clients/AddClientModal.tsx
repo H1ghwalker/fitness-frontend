@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Modal } from '@/components/ui/modal';
 import toast from 'react-hot-toast';
 import { TextField } from '@/components/ui/textfield';
+import { useApi } from '@/hooks/useApi';
 
 interface AddClientModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ interface AddClientModalProps {
 
 export default function AddClientModal({ isOpen, onClose, onClientAdded }: AddClientModalProps) {
   const [loading, setLoading] = useState(false);
+  const { makeRequest } = useApi();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -27,22 +29,16 @@ export default function AddClientModal({ isOpen, onClose, onClientAdded }: AddCl
     setLoading(true);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/clients`, {
+      await makeRequest('clients', {
         method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
-      if (res.ok) {
-        onClose();
-        onClientAdded?.();
-        toast.success('Client added successfully');
-        // Сбрасываем форму
-        setFormData({ name: '', email: '', phone: '', notes: '' });
-      } else {
-        toast.error('Failed to add client');
-      }
+      onClose();
+      onClientAdded?.();
+      toast.success('Client added successfully');
+      // Сбрасываем форму
+      setFormData({ name: '', email: '', phone: '', notes: '' });
     } catch (error) {
       console.error('Error adding client:', error);
       toast.error('An error occurred while adding the client');

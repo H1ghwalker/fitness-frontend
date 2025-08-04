@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { getExercises } from "@/lib/api";
+import { useApi } from "@/hooks/useApi";
 import { Search, Plus } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ interface ExerciseLibraryProps {
 }
 
 export default function ExerciseLibrary({ onSelectExercise }: ExerciseLibraryProps) {
+  const { makeRequest } = useApi();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [filteredExercises, setFilteredExercises] = useState<Exercise[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -53,7 +54,7 @@ export default function ExerciseLibrary({ onSelectExercise }: ExerciseLibraryPro
 
   const fetchExercises = async () => {
     try {
-      const data = await getExercises();
+      const data = await makeRequest('exercises');
       
       // Сервер возвращает объект с полем exercises
       const exercisesArray = data.exercises || [];

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import ExerciseLibrary from "./ExerciseLibrary";
 import WorkoutPlan from "./WorkoutPlan";
-import { createWorkoutTemplate } from "@/lib/api";
+import { useApi } from "@/hooks/useApi";
 import toast from "react-hot-toast";
 
 interface Exercise {
@@ -25,6 +25,7 @@ const DRAFT_KEY = 'workout-draft';
 const DRAFT_NAME_KEY = 'workout-draft-name';
 
 export default function WorkoutsPage() {
+  const { makeRequest } = useApi();
   const [workoutExercises, setWorkoutExercises] = useState<WorkoutExercise[]>([]);
   const [planName, setPlanName] = useState("");
 
@@ -87,15 +88,18 @@ export default function WorkoutsPage() {
 
   const handleSaveWorkout = async () => {
     try {
-      await createWorkoutTemplate({
-        name: planName,
-        exercises: workoutExercises.map(ex => ({
-          exerciseId: ex.id,
-          sets: ex.sets,
-          reps: ex.reps,
-          weight: ex.weight,
-          notes: ex.notes,
-        }))
+      await makeRequest('workout-templates', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: planName,
+          exercises: workoutExercises.map(ex => ({
+            exerciseId: ex.id,
+            sets: ex.sets,
+            reps: ex.reps,
+            weight: ex.weight,
+            notes: ex.notes,
+          }))
+        }),
       });
       
       // Очищаем черновик после успешного сохранения

@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { getSessionsByMonth } from '@/lib/api';
+import { useApi } from '@/hooks/useApi';
 import { Session } from '@/types/types';
 import { isSameDay } from 'date-fns';
 
 export const useCalendar = () => {
+  const { makeRequest } = useApi();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [sessions, setSessions] = useState<Session[]>([]);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
@@ -12,10 +13,12 @@ export const useCalendar = () => {
   useEffect(() => {
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth() + 1;
-    getSessionsByMonth(year, month)
+    makeRequest('sessions', { 
+      params: { month: `${year}-${String(month).padStart(2, '0')}` }
+    })
       .then(setSessions)
       .catch(console.error);
-  }, [currentMonth]);
+  }, [currentMonth, makeRequest]);
 
   // Для выделения дат сессий
   const sessionDates = sessions.map(session => new Date(session.date));
@@ -35,7 +38,9 @@ export const useCalendar = () => {
   const refreshSessions = () => {
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth() + 1;
-    getSessionsByMonth(year, month)
+    makeRequest('sessions', { 
+      params: { month: `${year}-${String(month).padStart(2, '0')}` }
+    })
       .then(setSessions)
       .catch(console.error);
   };

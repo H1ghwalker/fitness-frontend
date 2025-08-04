@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { TextField } from "@/components/ui/textfield";
 import { Modal } from "@/components/ui/modal";
-import { createExercise } from "@/lib/api";
+import { useApi } from "@/hooks/useApi";
 import toast from "react-hot-toast";
 
 interface CreateExerciseModalProps {
@@ -27,6 +27,7 @@ export default function CreateExerciseModal({
   onClose, 
   onExerciseCreated 
 }: CreateExerciseModalProps) {
+  const { makeRequest } = useApi();
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -51,7 +52,10 @@ export default function CreateExerciseModal({
     setLoading(true);
     
     try {
-      await createExercise(formData);
+      await makeRequest('exercises', {
+        method: 'POST',
+        body: JSON.stringify(formData),
+      });
       toast.success("Exercise created successfully!");
       setFormData({
         name: "",

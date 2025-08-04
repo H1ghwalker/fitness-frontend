@@ -3,32 +3,15 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Dumbbell, LayoutDashboard, Users, Calendar, ChevronLeft, ChevronRight, Menu, FileText, LogOut, TrendingUp } from 'lucide-react';
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState } from 'react';
 import { SidebarContext } from '@/components/layout/SidebarProvider';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Sidebar() {
   const pathname = usePathname();
   const { collapsed, toggle } = useContext(SidebarContext);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [user, setUser] = useState<{ name: string; role: string } | null>(null);
-
-  useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
-      credentials: 'include',
-    })
-      .then((res) => (res.ok ? res.json() : null))
-      .then(setUser)
-      .catch(() => setUser(null));
-  }, []);
-
-  const handleLogout = async () => {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
-      method: 'POST',
-      credentials: 'include',
-    });
-    setUser(null);
-    window.location.href = '/';
-  };
+  const { user, logout } = useAuth();
 
   if (pathname === '/') return null;
 
@@ -127,7 +110,7 @@ export default function Sidebar() {
                   </div>
                 </div>
                 <button
-                  onClick={handleLogout}
+                  onClick={logout}
                   className="w-full flex items-center gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                 >
                   <LogOut size={14} />
@@ -241,7 +224,7 @@ export default function Sidebar() {
                   </div>
                 </div>
                 <button
-                  onClick={handleLogout}
+                  onClick={logout}
                   className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                 >
                   <LogOut size={16} />

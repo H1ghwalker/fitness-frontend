@@ -3,7 +3,7 @@
 import { Dumbbell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
-import AuthModal from '@/components/auth/AuthModal';
+import NextAuthModal from '@/components/auth/NextAuthModal';
 
 export default function PublicHeader() {
   const [showModal, setShowModal] = useState(false);
@@ -23,7 +23,7 @@ export default function PublicHeader() {
           Sign In / Sign Up
         </Button>
       </div>
-      <AuthModal isOpen={showModal} onClose={() => setShowModal(false)} />
+      <NextAuthModal isOpen={showModal} onClose={() => setShowModal(false)} />
     </header>
   );
 }

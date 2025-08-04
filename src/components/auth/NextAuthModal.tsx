@@ -2,18 +2,18 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Modal } from '@/components/ui/modal';
 import toast from 'react-hot-toast';
-import { redirectForIOS } from '@/lib/utils';
 
-interface AuthModalProps {
+interface NextAuthModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
+export default function NextAuthModal({ isOpen, onClose }: NextAuthModalProps) {
   const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -29,43 +29,57 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     e.preventDefault();
     setLoading(true);
     setEmailError(null);
-    const endpoint = isLogin ? '/login' : '/register';
 
     try {
-      console.log('Attempting auth request to:', `${process.env.NEXT_PUBLIC_API_URL}/api/auth${endpoint}`);
-      
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth${endpoint}`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      if (isLogin) {
+        // Вход через NextAuth
+        console.log('Attempting login with:', { email: formData.email });
+        const result = await signIn('credentials', {
+          email: formData.email,
+          password: formData.password,
+          redirect: false,
+        });
 
-      console.log('Response status:', res.status);
+        console.log('Login result:', result);
 
-      if (res.ok) {
-        const user = await res.json();
-        console.log('Auth successful:', user);
-        onClose();
-        
-        const targetPath = user.role === 'Trainer' ? '/clients' : '/dashboard';
-        
-        // Простой редирект с поддержкой iOS
-        redirectForIOS(router, targetPath);
+        if (result?.error) {
+          toast.error('Invalid credentials. Please try again.');
+        } else if (result?.ok) {
+          onClose();
+          toast.success('Login successful! Redirecting...');
+          // Добавляем небольшую задержку для обновления сессии
+          setTimeout(() => {
+            router.push('/clients');
+          }, 500);
+        }
       } else {
-        const errorData = await res.json().catch(() => ({ message: 'Unknown error' }));
-        console.log('Server error response:', errorData);
-        
-        if (errorData?.message === 'User already exists') {
-          setEmailError('This email is already registered');
-          toast.error('This email is already registered. Please use another email or sign in.');
-        } else if (errorData?.message) {
-          toast.error(`Authentication error: ${errorData.message}`);
-        } else {
-          toast.error(`Authentication failed (${res.status}). Please try again.`);
+        // Регистрация через NextAuth
+        console.log('Attempting registration with:', { email: formData.email, name: formData.name, role: formData.role });
+        const result = await signIn('credentials', {
+          email: formData.email,
+          password: formData.password,
+          name: formData.name,
+          role: formData.role,
+          redirect: false,
+        });
+
+        console.log('Registration result:', result);
+
+        if (result?.error) {
+          if (result.error.includes('already exists')) {
+            setEmailError('This email is already registered');
+            toast.error('This email is already registered. Please use another email or sign in.');
+          } else {
+            toast.error(`Registration error: ${result.error}`);
+          }
+        } else if (result?.ok) {
+          onClose();
+          toast.success('Registration successful! Redirecting...');
+          const targetPath = formData.role === 'Trainer' ? '/clients' : '/dashboard';
+          // Добавляем небольшую задержку для обновления сессии
+          setTimeout(() => {
+            router.push(targetPath);
+          }, 500);
         }
       }
     } catch (error) {
@@ -175,8 +189,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             )}
           </button>
         </div>
-
       </form>
     </Modal>
   );
-}
+} 

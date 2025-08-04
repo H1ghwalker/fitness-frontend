@@ -5,7 +5,7 @@ import ClientCard from './ClientCard';
 import AddClientModal from './AddClientModal';
 import EditClientModal from './EditClientModal';
 import { Client } from '@/types/types';
-import { getClients, deleteClient } from '@/lib/api';
+import { useApi } from '@/hooks/useApi';
 import { Search, Users, Calendar, Dumbbell, Plus, Filter } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation';
 import { Modal } from '@/components/ui/modal';
 
 export default function ClientsPage() {
+  const { makeRequest } = useApi();
   const [isOpen, setIsOpen] = useState(false);
   const [clients, setClients] = useState<Client[]>([]);
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
@@ -45,7 +46,7 @@ export default function ClientsPage() {
     try {
       setError(null);
       setLoading(true);
-      const data = await getClients();
+      const data = await makeRequest('clients');
       setClients(data);
       setFilteredClients(data);
     } catch (error: unknown) {
@@ -139,7 +140,7 @@ export default function ClientsPage() {
     try {
       // Сначала пробуем удалить клиента напрямую
       try {
-        await deleteClient(deleteConfirmation.clientId);
+        await makeRequest(`clients/${deleteConfirmation.clientId}`, { method: 'DELETE' });
         setClients(prev => prev.filter(client => client.id !== deleteConfirmation.clientId));
         setFilteredClients(prev => prev.filter(client => client.id !== deleteConfirmation.clientId));
         toast.success('Client has been deleted');
@@ -155,29 +156,17 @@ export default function ClientsPage() {
       const month = today.getMonth() + 1;
       
       // Получаем сессии за текущий месяц
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/sessions?month=${year}-${String(month).padStart(2, '0')}`, {
-        credentials: 'include',
+      const sessions = await makeRequest('sessions', { 
+        params: { month: `${year}-${String(month).padStart(2, '0')}` }
       });
 
-      if (!response.ok) {
-        console.error('Failed to fetch sessions:', response.status, response.statusText);
-        toast.error('Failed to delete client');
-        setDeleteConfirmation({ isOpen: false, clientId: null, clientName: '', isLoading: false });
-        return;
-      }
-
-      const allSessions = await response.json();
-      
       // Фильтруем сессии только для этого клиента
-      const clientSessions = allSessions.filter((session: any) => session.Client?.id === deleteConfirmation.clientId);
+      const clientSessions = sessions.filter((session: any) => session.Client?.id === deleteConfirmation.clientId);
       
       if (clientSessions.length > 0) {
         // Удаляем каждую сессию клиента
         const deletePromises = clientSessions.map((session: any) => 
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/sessions/${session.id}`, {
-            method: 'DELETE',
-            credentials: 'include',
-          })
+          makeRequest(`sessions/${session.id}`, { method: 'DELETE' })
         );
 
         // Ждем удаления всех сессий
@@ -194,7 +183,7 @@ export default function ClientsPage() {
       }
 
       // После успешного удаления всех сессий пробуем снова удалить клиента
-      await deleteClient(deleteConfirmation.clientId);
+      await makeRequest(`clients/${deleteConfirmation.clientId}`, { method: 'DELETE' });
       setClients(prev => prev.filter(client => client.id !== deleteConfirmation.clientId));
       setFilteredClients(prev => prev.filter(client => client.id !== deleteConfirmation.clientId));
       toast.success('Client and all their sessions have been deleted');

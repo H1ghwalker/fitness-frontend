@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { getClients, getWorkoutTemplates, createSession, deleteSession, updateSession, updateSessionStatus, updateClientNextSession } from '@/lib/api';
+import { useApi } from '@/hooks/useApi';
 import { Session, ServerWorkoutTemplate } from '@/types/types';
 import { toast } from 'react-hot-toast';
 
 export const useSessions = (sessions: Session[], setSessions: React.Dispatch<React.SetStateAction<Session[]>>) => {
+  const { makeRequest } = useApi();
   const [clients, setClients] = useState<{ id: number; User?: { name: string; email: string } }[]>([]);
   const [templates, setTemplates] = useState<ServerWorkoutTemplate[]>([]);
   const [isCreatingSession, setIsCreatingSession] = useState(false);
@@ -14,8 +15,8 @@ export const useSessions = (sessions: Session[], setSessions: React.Dispatch<Rea
   const loadFormData = async () => {
     try {
       const [clientsData, templatesData] = await Promise.all([
-        getClients(),
-        getWorkoutTemplates()
+        makeRequest('clients'),
+        makeRequest('workout-templates')
       ]);
       setClients(clientsData);
       setTemplates(templatesData.templates);
@@ -77,7 +78,10 @@ export const useSessions = (sessions: Session[], setSessions: React.Dispatch<Rea
 
       setSessions(prev => [...prev, optimisticSession]);
 
-      await createSession(finalSessionData);
+      await makeRequest('sessions', {
+        method: 'POST',
+        body: JSON.stringify(finalSessionData),
+      });
 
       toast.success('Session created successfully');
       onSuccess?.();
@@ -104,8 +108,11 @@ export const useSessions = (sessions: Session[], setSessions: React.Dispatch<Rea
         return;
       }
 
-      await deleteSession(sessionId);
-      await updateClientNextSession(sessionToDelete.clientId, null);
+      await makeRequest(`sessions/${sessionId}`, { method: 'DELETE' });
+      await makeRequest(`clients/${sessionToDelete.clientId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ nextSession: null }),
+      });
       
       toast.success('Session has been canceled');
       setSessions(sessions => sessions.filter(s => s.id !== sessionId));
@@ -122,7 +129,10 @@ export const useSessions = (sessions: Session[], setSessions: React.Dispatch<Rea
   const updateSessionStatusById = async (sessionId: number, newStatus: string) => {
     setIsStatusUpdating(sessionId);
     try {
-      await updateSessionStatus(sessionId, newStatus);
+      await makeRequest(`sessions/${sessionId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ status: newStatus }),
+      });
       setSessions(sessions =>
         sessions.map(s =>
           s.id === sessionId ? { ...s, status: newStatus as Session['status'] } : s
@@ -139,7 +149,10 @@ export const useSessions = (sessions: Session[], setSessions: React.Dispatch<Rea
   // Обновление заметки сессии
   const updateSessionNote = async (sessionId: number, note: string) => {
     try {
-      await updateSession(sessionId, { note });
+      await makeRequest(`sessions/${sessionId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ note }),
+      });
       setSessions((prev) => prev.map(s => s.id === sessionId ? { ...s, note } : s));
       toast.success('Note updated');
     } catch (e) {

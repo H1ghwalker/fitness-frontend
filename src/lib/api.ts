@@ -1,3 +1,5 @@
+import { signOut } from 'next-auth/react';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
 
 // Импортируем типы
@@ -14,6 +16,14 @@ import {
   ProgressStats,
   Client
 } from '../types/types';
+
+// Функция для получения токена из localStorage (временное решение)
+const getAuthToken = (): string | null => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('next-auth.access-token');
+  }
+  return null;
+};
 
 // Универсальная функция для всех API запросов
 const makeRequest = async (endpoint: string, options: RequestInit & { params?: Record<string, string | number> } = {}) => {
@@ -39,12 +49,23 @@ const makeRequest = async (endpoint: string, options: RequestInit & { params?: R
   }
 
   try {
+    // Получаем токен для авторизации
+    const token = getAuthToken();
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    
+    // Добавляем токен авторизации если есть
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+      console.log('Adding Authorization header with token');
+    } else {
+      console.log('No auth token found');
+    }
+
     // Делаем запрос к серверу
     // Пример: GET запрос к 'http://localhost:1337/api/sessions?date=2024-01-15'
     console.log(`🌐 Making ${fetchOptions.method || 'GET'} request to: ${url}`);
     const response = await fetch(url, {
-      credentials: 'include', // Отправляем куки для авторизации
-      headers: { 'Content-Type': 'application/json' }, // Говорим серверу что отправляем JSON
+      headers,
       ...fetchOptions // Добавляем дополнительные настройки (method, body и т.д.)
     });
 
@@ -54,8 +75,9 @@ const makeRequest = async (endpoint: string, options: RequestInit & { params?: R
     if (!response.ok) {
       // Обработка ошибки 401 - перенаправляем на главную страницу
       if (response.status === 401) {
-        // Очищаем куки и перенаправляем на главную
-        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        // Для NextAuth используем signOut
+        console.log('Unauthorized - signing out and redirecting to home page');
+        await signOut({ redirect: false });
         window.location.href = '/';
         throw new Error('Unauthorized. Please log in.');
       }
