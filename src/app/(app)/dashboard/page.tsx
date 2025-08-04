@@ -46,8 +46,8 @@ export default function DashboardPage() {
 
   const activeClients = clients.length;
   const today = new Date();
-  const upcomingSessions = sessions.filter(s => new Date(s.date) >= today);
-  const todaySessions = sessions.filter(s => s.date.startsWith(getTodayISO()));
+          const upcomingSessions = sessions.filter((s: any) => new Date(s.date) >= today);
+        const todaySessions = sessions.filter((s: any) => s.date.startsWith(getTodayISO()));
 
   // Простой расчет тренда (для MVP)
   const clientTrend = activeClients > 0 ? "+3 this month" : "0 this month";
@@ -189,8 +189,8 @@ export default function DashboardPage() {
               <div className="space-y-4">
                 {clients.slice(0, 3).map((client, index) => {
                   // Подсчитываем количество сессий для каждого клиента
-                  const clientSessions = sessions.filter(s => s.clientId === client.id);
-                  const completedSessions = clientSessions.filter(s => s.status === 'completed').length;
+                          const clientSessions = sessions.filter((s: any) => s.clientId === client.id);
+        const completedSessions = clientSessions.filter((s: any) => s.status === 'completed').length;
                   const totalSessions = clientSessions.length;
                   
                   // Вычисляем процент прогресса (завершенные сессии от общего количества)

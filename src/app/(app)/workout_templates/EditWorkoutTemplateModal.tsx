@@ -168,7 +168,7 @@ export default function EditWorkoutTemplateModal({ templateId, onClose, onUpdate
     e.preventDefault();
     
     // Проверяем что все упражнения имеют валидный exerciseId
-    const invalidExercises = formData.exercises.filter(ex => ex.exerciseId === 0);
+            const invalidExercises = formData.exercises.filter((ex: any) => ex.exerciseId === 0);
     if (invalidExercises.length > 0) {
       toast.error(`Please select exercises for ${invalidExercises.length} exercise(s)`);
       return;

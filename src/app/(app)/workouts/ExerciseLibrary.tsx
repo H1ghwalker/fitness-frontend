@@ -38,7 +38,7 @@ export default function ExerciseLibrary({ onSelectExercise }: ExerciseLibraryPro
   const categoryCounts = useMemo(() => {
     const counts: { [key: string]: number } = { "All": exercises.length };
     
-    exercises.forEach(ex => {
+    exercises.forEach((ex: any) => {
       counts[ex.category] = (counts[ex.category] || 0) + 1;
     });
     
@@ -82,14 +82,14 @@ export default function ExerciseLibrary({ onSelectExercise }: ExerciseLibraryPro
     
     if (query) {
       const lowerQuery = query.toLowerCase();
-      result = result.filter(ex =>
+      result = result.filter((ex: any) =>
         ex.name.toLowerCase().includes(lowerQuery) ||
         ex.muscleGroup.toLowerCase().includes(lowerQuery)
       );
     }
 
     if (category !== 'All') {
-      result = result.filter(ex => ex.category === category);
+      result = result.filter((ex: any) => ex.category === category);
     }
 
     setFilteredExercises(result);

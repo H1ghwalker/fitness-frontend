@@ -51,9 +51,9 @@ export default function WorkoutTemplatesPage() {
     let result = templates;
 
     if (query) {
-      result = result.filter(template =>
+      result = result.filter((template: any) =>
         template.name.toLowerCase().includes(query.toLowerCase()) ||
-        template.Exercises.some(ex => 
+        template.Exercises.some((ex: any) => 
           ex.Exercise.name.toLowerCase().includes(query.toLowerCase()) ||
           ex.Exercise.category.toLowerCase().includes(query.toLowerCase())
         )
@@ -61,8 +61,8 @@ export default function WorkoutTemplatesPage() {
     }
 
     if (filterType !== 'All') {
-      result = result.filter(template => 
-        template.Exercises.some(ex => ex.Exercise.category === filterType)
+      result = result.filter((template: any) => 
+        template.Exercises.some((ex: any) => ex.Exercise.category === filterType)
       );
     }
 
@@ -101,8 +101,8 @@ export default function WorkoutTemplatesPage() {
 
     try {
       await makeRequest(`workout-templates/${templateId}`, { method: 'DELETE' });
-      setTemplates(prev => prev.filter(template => template.id !== templateId));
-      setFilteredTemplates(prev => prev.filter(template => template.id !== templateId));
+              setTemplates(prev => prev.filter((template: any) => template.id !== templateId));
+        setFilteredTemplates(prev => prev.filter((template: any) => template.id !== templateId));
       toast.success('Template deleted successfully');
     } catch (error) {
       console.error('Error deleting template:', error);

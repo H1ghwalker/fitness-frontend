@@ -167,8 +167,8 @@ export default function ProgressPageClient() {
         
         // 4. Создаём данные для графика веса
         const weightDataForChart = allMeasurements
-          .filter(m => m.weight)
-          .map(m => ({ 
+          .filter((m: any) => m.weight)
+          .map((m: any) => ({ 
             date: m.date, 
             weight: Number(m.weight),
             isFromProfile: m.isFromProfile || false
@@ -182,11 +182,11 @@ export default function ProgressPageClient() {
         const sessions = await makeRequest('sessions', { 
           params: { month: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}` }
         });
-        const clientSessions = sessions.filter(s => s.clientId === selectedClientId);
+        const clientSessions = sessions.filter((s: any) => s.clientId === selectedClientId);
         setSessions(clientSessions);
         
         const byMonth: Record<string, { completed: number; canceled: number; scheduled: number }> = {};
-        clientSessions.forEach(s => {
+        clientSessions.forEach((s: any) => {
           const month = s.date.slice(0, 7);
           if (!byMonth[month]) byMonth[month] = { completed: 0, canceled: 0, scheduled: 0 };
           if (s.status === 'completed') byMonth[month].completed++;
@@ -267,8 +267,8 @@ export default function ProgressPageClient() {
         
         // Создаём данные для графика веса
         const weightDataForChart = allMeasurements
-          .filter(m => m.weight)
-          .map(m => ({ 
+          .filter((m: any) => m.weight)
+          .map((m: any) => ({ 
             date: m.date, 
             weight: Number(m.weight),
             isFromProfile: m.isFromProfile || false

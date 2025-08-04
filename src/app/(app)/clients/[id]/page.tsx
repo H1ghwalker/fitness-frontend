@@ -257,7 +257,7 @@ export default function ClientDetailsPage() {
   const handleSectionSave = async (fields: string[], newValues: Record<string, any>) => {
     // Собираем только изменяемые поля в плоском формате
     const updateData: Record<string, any> = {};
-    fields.forEach(f => {
+            fields.forEach((f: any) => {
       if (newValues[f] !== undefined) updateData[f] = newValues[f];
     });
     await updateClient(client.id, updateData);

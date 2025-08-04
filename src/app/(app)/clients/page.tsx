@@ -84,7 +84,7 @@ export default function ClientsPage() {
     let result = clients;
     if (query) {
       const lowerQuery = query.toLowerCase();
-      result = result.filter(client =>
+      result = result.filter((client: any) =>
         
         client.User?.name?.toLowerCase().includes(lowerQuery) ||
         client.User?.email?.toLowerCase().includes(lowerQuery)
@@ -92,7 +92,7 @@ export default function ClientsPage() {
     }
 
     if (filterType !== 'All') {
-      result = result.filter(client =>
+      result = result.filter((client: any) =>
         filterType === 'Subscription'
           ? client.plan === 'Premium Monthly' || client.plan === 'Standard Weekly'
           : client.plan === 'Single Session'
@@ -141,8 +141,8 @@ export default function ClientsPage() {
       // Сначала пробуем удалить клиента напрямую
       try {
         await makeRequest(`clients/${deleteConfirmation.clientId}`, { method: 'DELETE' });
-        setClients(prev => prev.filter(client => client.id !== deleteConfirmation.clientId));
-        setFilteredClients(prev => prev.filter(client => client.id !== deleteConfirmation.clientId));
+        setClients(prev => prev.filter((client: any) => client.id !== deleteConfirmation.clientId));
+        setFilteredClients(prev => prev.filter((client: any) => client.id !== deleteConfirmation.clientId));
         toast.success('Client has been deleted');
         setDeleteConfirmation({ isOpen: false, clientId: null, clientName: '', isLoading: false });
         return;
@@ -173,7 +173,7 @@ export default function ClientsPage() {
         const deleteResults = await Promise.allSettled(deletePromises);
         
         // Проверяем, были ли ошибки при удалении сессий
-        const failedDeletes = deleteResults.filter(result => result.status === 'rejected');
+        const failedDeletes = deleteResults.filter((result: any) => result.status === 'rejected');
         if (failedDeletes.length > 0) {
           console.error('Some sessions failed to delete:', failedDeletes);
           toast.error('Failed to delete some sessions');
@@ -184,8 +184,8 @@ export default function ClientsPage() {
 
       // После успешного удаления всех сессий пробуем снова удалить клиента
       await makeRequest(`clients/${deleteConfirmation.clientId}`, { method: 'DELETE' });
-      setClients(prev => prev.filter(client => client.id !== deleteConfirmation.clientId));
-      setFilteredClients(prev => prev.filter(client => client.id !== deleteConfirmation.clientId));
+      setClients(prev => prev.filter((client: any) => client.id !== deleteConfirmation.clientId));
+      setFilteredClients(prev => prev.filter((client: any) => client.id !== deleteConfirmation.clientId));
       toast.success('Client and all their sessions have been deleted');
       setDeleteConfirmation({ isOpen: false, clientId: null, clientName: '', isLoading: false });
     } catch (err) {
