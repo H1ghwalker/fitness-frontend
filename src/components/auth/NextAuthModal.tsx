@@ -37,7 +37,6 @@ export default function NextAuthModal({ isOpen, onClose }: NextAuthModalProps) {
         const result = await signIn('credentials', {
           email: formData.email,
           password: formData.password,
-          callbackUrl: '/clients',
           redirect: false,
         });
 
@@ -47,7 +46,10 @@ export default function NextAuthModal({ isOpen, onClose }: NextAuthModalProps) {
         } else if (result?.ok) {
           onClose();
           toast.success('Login successful! Redirecting...');
-          router.push('/clients');
+          // Добавляем небольшую задержку для обновления сессии
+          setTimeout(() => {
+            router.push('/clients');
+          }, 1000);
         }
       } else {
         // Регистрация через NextAuth
@@ -57,7 +59,6 @@ export default function NextAuthModal({ isOpen, onClose }: NextAuthModalProps) {
           password: formData.password,
           name: formData.name,
           role: formData.role,
-          callbackUrl: formData.role === 'Trainer' ? '/clients' : '/dashboard',
           redirect: false,
         });
 
@@ -73,7 +74,10 @@ export default function NextAuthModal({ isOpen, onClose }: NextAuthModalProps) {
           onClose();
           toast.success('Registration successful! Redirecting...');
           const targetPath = formData.role === 'Trainer' ? '/clients' : '/dashboard';
-          router.push(targetPath);
+          // Добавляем небольшую задержку для обновления сессии
+          setTimeout(() => {
+            router.push(targetPath);
+          }, 1000);
         }
       }
     } catch (error) {

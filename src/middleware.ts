@@ -3,7 +3,20 @@ import { withAuth } from "next-auth/middleware"
 export default withAuth(
   function middleware(req) {
     console.log('Middleware called for:', req.nextUrl.pathname)
-    // Дополнительная логика middleware если нужна
+    
+    // Если пользователь аутентифицирован и находится на главной странице с callbackUrl,
+    // перенаправляем на указанный URL
+    if (req.nextUrl.pathname === '/' && req.nextUrl.searchParams.get('callbackUrl')) {
+      const callbackUrl = req.nextUrl.searchParams.get('callbackUrl')
+      if (callbackUrl) {
+        console.log('Found callbackUrl:', callbackUrl)
+        // Проверяем, что callbackUrl безопасный (начинается с /)
+        if (callbackUrl.startsWith('/')) {
+          console.log('Redirecting to callback URL:', callbackUrl)
+          return Response.redirect(new URL(callbackUrl, req.url))
+        }
+      }
+    }
   },
   {
     callbacks: {
@@ -20,6 +33,7 @@ export default withAuth(
 
 export const config = {
   matcher: [
+    "/",
     "/dashboard/:path*",
     "/clients/:path*",
     "/workouts/:path*",
