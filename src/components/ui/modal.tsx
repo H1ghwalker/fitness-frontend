@@ -18,8 +18,15 @@ export function Modal({ isOpen, onClose, title, children, size = 'lg' }: ModalPr
 
   useEffect(() => {
     if (isOpen) {
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = 'hidden';
       const timer = setTimeout(() => setMounted(true), 10);
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+        document.body.style.overflow = 'unset';
+      };
+    } else {
+      document.body.style.overflow = 'unset';
     }
   }, [isOpen]);
 
@@ -59,7 +66,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'lg' }: ModalPr
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm transition-all duration-300 ${
+      className={`fixed inset-0 z-50 flex items-start sm:items-center justify-center backdrop-blur-sm transition-all duration-300 ${
         closing ? 'opacity-0' : 'opacity-100'
       } ${isBackdropClicked ? 'bg-black/60' : 'bg-black/40'}`}
       onMouseDown={handleBackdropMouseDown}
@@ -68,23 +75,30 @@ export function Modal({ isOpen, onClose, title, children, size = 'lg' }: ModalPr
       <div
         className={`relative w-[95%] sm:w-auto sm:min-w-[22rem] ${sizeClass} bg-white rounded-lg shadow-xl transform transition-all duration-300 ${
           closing || !mounted ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
-        } p-4 sm:p-6 md:p-8 max-h-[85vh] sm:max-h-[90vh] overflow-y-auto mx-4`}
+        } p-4 sm:p-6 md:p-8 max-h-[90vh] sm:max-h-[90vh] overflow-y-auto mx-2 sm:mx-4 mt-4 sm:mt-0`}
         onMouseDown={(e) => e.stopPropagation()}
+        style={{
+          maxHeight: 'calc(100vh - 2rem)',
+          marginTop: '1rem',
+          marginBottom: '1rem',
+        }}
       >
         <button
           onClick={handleClose}
-          className="absolute top-2 right-3 sm:top-3 sm:right-4 text-gray-400 hover:text-gray-600 text-xl sm:text-2xl transition-colors p-1"
+          className="absolute top-2 right-2 sm:top-3 sm:right-4 text-gray-400 hover:text-gray-600 text-xl sm:text-2xl transition-colors p-1 z-10"
         >
           &times;
         </button>
 
         {title && (
-          <h2 className="text-xl sm:text-2xl font-semibold text-center mb-4 sm:mb-6 text-primary pr-8">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-center mb-4 sm:mb-6 text-primary pr-8">
             {title}
           </h2>
         )}
 
-        {children}
+        <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 8rem)' }}>
+          {children}
+        </div>
       </div>
     </div>
   );

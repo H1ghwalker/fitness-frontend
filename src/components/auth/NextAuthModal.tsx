@@ -89,7 +89,7 @@ export default function NextAuthModal({ isOpen, onClose }: NextAuthModalProps) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={isLogin ? 'Sign In' : 'Sign Up'}>
+    <Modal isOpen={isOpen} onClose={onClose} title={isLogin ? 'Sign In' : 'Sign Up'} size="md">
       <form onSubmit={handleSubmit} className="space-y-4">
         {!isLogin && (
           <>
