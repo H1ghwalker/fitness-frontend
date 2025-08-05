@@ -1,5 +1,4 @@
 import { signOut, getSession } from 'next-auth/react';
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
 
 // Импортируем типы
@@ -29,21 +28,12 @@ const getAuthToken = async (): Promise<string | null> => {
 
 // Универсальная функция для всех API запросов
 const makeRequest = async (endpoint: string, options: RequestInit & { params?: Record<string, string | number> } = {}) => {
-  // Разделяем параметры URL от настроек fetch
-  // Пример: { params: { date: '2024-01-15' }, method: 'POST' } 
-  // → params = { date: '2024-01-15' }, fetchOptions = { method: 'POST' }
   const { params, ...fetchOptions } = options;
   
-  // Начинаем формировать URL
-  // Пример: endpoint = 'sessions' → url = 'http://localhost:1337/api/sessions'
   let url = `${API_URL}/api/${endpoint}`;
   
-  // Если есть параметры, добавляем их к URL
-  // Пример: params = { date: '2024-01-15' } → url = 'http://localhost:1337/api/sessions?date=2024-01-15'
   if (params) {
     const searchParams = new URLSearchParams();
-    // Проходим по всем параметрам и добавляем их
-    // Пример: { date: '2024-01-15', month: '2024-01' } → 'date=2024-01-15&month=2024-01'
     Object.entries(params).forEach(([key, value]) => 
       searchParams.append(key, String(value))
     );
@@ -51,34 +41,20 @@ const makeRequest = async (endpoint: string, options: RequestInit & { params?: R
   }
 
   try {
-    // Получаем токен для авторизации
     const token = await getAuthToken();
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     
-    // Добавляем токен авторизации если есть
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
-      console.log('Adding Authorization header with token');
-    } else {
-      console.log('No auth token found');
     }
 
-    // Делаем запрос к серверу
-    // Пример: GET запрос к 'http://localhost:1337/api/sessions?date=2024-01-15'
-    console.log(`🌐 Making ${fetchOptions.method || 'GET'} request to: ${url}`);
     const response = await fetch(url, {
       headers,
-      ...fetchOptions // Добавляем дополнительные настройки (method, body и т.д.)
+      ...fetchOptions
     });
 
-    console.log(`📡 Response status: ${response.status} ${response.statusText}`);
-
-    // Проверяем успешность запроса
     if (!response.ok) {
-      // Обработка ошибки 401 - перенаправляем на главную страницу
       if (response.status === 401) {
-        // Для NextAuth используем signOut
-        console.log('Unauthorized - signing out and redirecting to home page');
         await signOut({ redirect: false });
         window.location.href = '/';
         throw new Error('Unauthorized. Please log in.');
@@ -86,21 +62,18 @@ const makeRequest = async (endpoint: string, options: RequestInit & { params?: R
       
       let errorMessage = `API Error: ${response.status}`;
       
-      // Пытаемся получить детальную информацию об ошибке
       try {
         const errorData = await response.json();
         if (errorData.message) {
           errorMessage += ` - ${errorData.message}`;
         }
       } catch (parseError) {
-        // Если не удалось распарсить JSON, используем текст ответа
         try {
           const errorText = await response.text();
           if (errorText) {
             errorMessage += ` - ${errorText}`;
           }
         } catch (textError) {
-          // Если и текст не удалось получить, добавляем стандартное сообщение
           switch (response.status) {
             case 403:
               errorMessage += ' - Forbidden. Insufficient permissions.';
@@ -117,27 +90,19 @@ const makeRequest = async (endpoint: string, options: RequestInit & { params?: R
         }
       }
       
-      console.error(`❌ API Error: ${errorMessage}`);
       throw new Error(errorMessage);
     }
 
-    // Возвращаем данные в формате JSON
-    // Пример: { id: 1, name: 'John', email: 'john@example.com' }
     if (response.status === 204) {
-      // Для DELETE запросов, которые возвращают 204 No Content
-      console.log(`✅ DELETE request successful (204 No Content)`);
       return null;
     }
+    
     const data = await response.json();
-    console.log(`✅ Request successful, data:`, data);
     return data;
   } catch (error) {
-    // Если это ошибка сети или другой тип ошибки
     if (error instanceof TypeError && error.message.includes('fetch')) {
       throw new Error('Network error. Please check your connection and try again.');
     }
-    
-    // Перебрасываем остальные ошибки
     throw error;
   }
 };
