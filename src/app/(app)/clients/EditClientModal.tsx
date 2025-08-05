@@ -97,8 +97,8 @@ export default function EditClientModal({ clientId, onClose, onUpdated }: Props)
   if (loading && !formData.name) return <div>Loading...</div>;
 
   return (
-    <Modal isOpen={true} onClose={onClose} size="lg" title="Edit Client">
-      <form onSubmit={handleSubmit} className="space-y-4 min-w-[28rem]">
+    <Modal isOpen={true} onClose={onClose} size="md" title="Edit Client">
+      <form onSubmit={handleSubmit} className="space-y-4 w-full">
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-primary mb-2">
             Name <span className="text-red-500">*</span>
@@ -111,6 +111,7 @@ export default function EditClientModal({ clientId, onClose, onUpdated }: Props)
             value={formData.name}
             onChange={handleChange}
             placeholder="John Doe"
+            className="w-full"
           />
         </div>
         <div>
@@ -125,6 +126,7 @@ export default function EditClientModal({ clientId, onClose, onUpdated }: Props)
             value={formData.email}
             onChange={handleChange}
             placeholder="john@example.com"
+            className="w-full"
           />
         </div>
         <div>
@@ -138,6 +140,7 @@ export default function EditClientModal({ clientId, onClose, onUpdated }: Props)
             value={formData.phone}
             onChange={handleChange}
             placeholder="+1 (555) 000-0000"
+            className="w-full"
           />
         </div>
         <div>
@@ -149,13 +152,14 @@ export default function EditClientModal({ clientId, onClose, onUpdated }: Props)
             name="plan"
             value={formData.plan}
             onChange={handleChange}
+            className="w-full"
           >
             <option value="Premium Monthly">Premium Monthly</option>
             <option value="Standard Weekly">Standard Weekly</option>
             <option value="Single Session">Single Session</option>
           </Select>
         </div>
-        <div className="flex gap-2 pt-4">
+        <div className="flex flex-col sm:flex-row gap-2 pt-4">
           <Button type="button" variant="danger" className="flex-1" onClick={onClose}>
             Cancel
           </Button>

@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Plus, Scale, Calendar } from 'lucide-react';
+import { Plus, Scale, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Modal } from '@/components/ui/modal';
+import { TextField } from '@/components/ui/textfield';
 import { useApi } from '@/hooks/useApi';
 import toast from 'react-hot-toast';
 
@@ -97,156 +99,139 @@ export const AddMeasurementModal: React.FC<AddMeasurementModalProps> = ({
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <Plus className="h-5 w-5 text-violet-500" />
-            Add Measurement
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <X className="h-5 w-5" />
-          </button>
+    <Modal isOpen={isOpen} onClose={onClose} title="Add Measurement" size="md">
+      <form onSubmit={handleSubmit} className="space-y-4 w-full">
+        <div className="mb-4">
+          <p className="text-sm text-gray-600">
+            Adding measurement for <span className="font-medium text-gray-900">{clientName}</span>
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="mb-4">
-            <p className="text-sm text-gray-600">
-              Adding measurement for <span className="font-medium text-gray-900">{clientName}</span>
-            </p>
-          </div>
+        {/* Date */}
+        <div>
+          <label className="flex text-sm font-medium text-gray-700 mb-2 items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            Date
+          </label>
+          <Input
+            type="date"
+            value={formData.date}
+            onChange={(e) => handleInputChange('date', e.target.value)}
+            required
+            className="w-full"
+          />
+        </div>
 
-          {/* Date */}
-          <div>
-            <label className="flex text-sm font-medium text-gray-700 mb-2 items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Date
-            </label>
-            <Input
-              type="date"
-              value={formData.date}
-              onChange={(e) => handleInputChange('date', e.target.value)}
-              required
-              className="w-full"
-            />
-          </div>
+        {/* Weight */}
+        <div>
+          <label className="flex text-sm font-medium text-gray-700 mb-2 items-center gap-2">
+            <Scale className="h-4 w-4" />
+            Weight (kg)
+          </label>
+          <Input
+            type="number"
+            step="0.1"
+            min="20"
+            max="300"
+            placeholder="e.g., 75.5"
+            value={formData.weight}
+            onChange={(e) => handleInputChange('weight', e.target.value)}
+            className="w-full"
+          />
+        </div>
 
-          {/* Weight */}
+        {/* Measurements Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="flex text-sm font-medium text-gray-700 mb-2 items-center gap-2">
-              <Scale className="h-4 w-4" />
-              Weight (kg)
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Chest (cm)
             </label>
             <Input
               type="number"
               step="0.1"
-              min="20"
-              max="300"
-              placeholder="e.g., 75.5"
-              value={formData.weight}
-              onChange={(e) => handleInputChange('weight', e.target.value)}
+              placeholder="e.g., 95"
+              value={formData.chest}
+              onChange={(e) => handleInputChange('chest', e.target.value)}
               className="w-full"
             />
           </div>
-
-          {/* Measurements Grid */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Chest (cm)
-              </label>
-              <Input
-                type="number"
-                step="0.1"
-                placeholder="e.g., 95"
-                value={formData.chest}
-                onChange={(e) => handleInputChange('chest', e.target.value)}
-                className="w-full"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Waist (cm)
-              </label>
-              <Input
-                type="number"
-                step="0.1"
-                placeholder="e.g., 80"
-                value={formData.waist}
-                onChange={(e) => handleInputChange('waist', e.target.value)}
-                className="w-full"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Hips (cm)
-              </label>
-              <Input
-                type="number"
-                step="0.1"
-                placeholder="e.g., 100"
-                value={formData.hips}
-                onChange={(e) => handleInputChange('hips', e.target.value)}
-                className="w-full"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Biceps (cm)
-              </label>
-              <Input
-                type="number"
-                step="0.1"
-                placeholder="e.g., 35"
-                value={formData.biceps}
-                onChange={(e) => handleInputChange('biceps', e.target.value)}
-                className="w-full"
-              />
-            </div>
-          </div>
-
-          {/* Notes */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Notes (optional)
+              Waist (cm)
             </label>
-            <textarea
-              value={formData.notes}
-              onChange={(e) => handleInputChange('notes', e.target.value)}
-              placeholder="Any additional notes about this measurement..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none"
-              rows={3}
+            <Input
+              type="number"
+              step="0.1"
+              placeholder="e.g., 80"
+              value={formData.waist}
+              onChange={(e) => handleInputChange('waist', e.target.value)}
+              className="w-full"
             />
           </div>
-
-          {/* Buttons */}
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              disabled={loading}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="default"
-              disabled={loading}
-              className="flex-1"
-            >
-              {loading ? 'Adding...' : 'Add Measurement'}
-            </Button>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Hips (cm)
+            </label>
+            <Input
+              type="number"
+              step="0.1"
+              placeholder="e.g., 100"
+              value={formData.hips}
+              onChange={(e) => handleInputChange('hips', e.target.value)}
+              className="w-full"
+            />
           </div>
-        </form>
-      </div>
-    </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Biceps (cm)
+            </label>
+            <Input
+              type="number"
+              step="0.1"
+              placeholder="e.g., 35"
+              value={formData.biceps}
+              onChange={(e) => handleInputChange('biceps', e.target.value)}
+              className="w-full"
+            />
+          </div>
+        </div>
+
+        {/* Notes */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Notes (optional)
+          </label>
+          <TextField
+            value={formData.notes}
+            onChange={(e) => handleInputChange('notes', e.target.value)}
+            placeholder="Any additional notes about this measurement..."
+            rows={3}
+            className="w-full"
+          />
+        </div>
+
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={loading}
+            className="flex-1"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            variant="default"
+            disabled={loading}
+            className="flex-1"
+          >
+            {loading ? 'Adding...' : 'Add Measurement'}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }; 

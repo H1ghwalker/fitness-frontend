@@ -61,7 +61,7 @@ export default function AddClientModal({ isOpen, onClose, onClientAdded }: AddCl
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} size="md" title="Add New Client">
-      <form onSubmit={handleSubmit} className="space-y-4 min-w-[24rem]">
+      <form onSubmit={handleSubmit} className="space-y-4 w-full">
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-primary mb-2">
             Name <span className="text-red-500">*</span>
@@ -74,6 +74,7 @@ export default function AddClientModal({ isOpen, onClose, onClientAdded }: AddCl
             value={formData.name}
             onChange={handleChange}
             placeholder="John Doe"
+            className="w-full"
           />
         </div>
         <div>
@@ -88,6 +89,7 @@ export default function AddClientModal({ isOpen, onClose, onClientAdded }: AddCl
             value={formData.email}
             onChange={handleChange}
             placeholder="john@example.com"
+            className="w-full"
           />
         </div>
         <div>
@@ -101,6 +103,7 @@ export default function AddClientModal({ isOpen, onClose, onClientAdded }: AddCl
             value={formData.phone}
             onChange={handleChange}
             placeholder="+1 (555) 000-0000"
+            className="w-full"
           />
         </div>
         <div>
@@ -114,9 +117,10 @@ export default function AddClientModal({ isOpen, onClose, onClientAdded }: AddCl
             onChange={handleChange}
             placeholder="Add any notes about the client..."
             rows={3}
+            className="w-full"
           />
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <Button type="button" variant="danger" className="flex-1" onClick={handleClose}>
             Cancel
           </Button>

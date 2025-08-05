@@ -207,6 +207,10 @@ export default function ClientsPage() {
     router.push(`/clients/${clientId}/progress`);
   };
 
+  const handleClientClick = (clientId: number) => {
+    router.push(`/clients/${clientId}`);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -221,7 +225,7 @@ export default function ClientsPage() {
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4 sm:mb-6">
           <div>
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F2A44] mb-1">Clients</h1>
-            <p className="text-xs sm:text-sm text-[#6B7280]">Manage your client list and details</p>
+            <p className="text-xs sm:text-sm text-[#6B7280]">Manage your client list and details. Click on any client card to view details.</p>
           </div>
           <Button
             type="button"
@@ -321,6 +325,7 @@ export default function ClientsPage() {
                 onEdit={() => handleEdit(client.id)}
                 onDelete={() => handleDeleteClient(client.id, client.User?.name || 'Unknown')}
                 onProgress={() => handleProgress(client.id)}
+                onClick={() => handleClientClick(client.id)}
               />
             ))
           )}

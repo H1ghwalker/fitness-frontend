@@ -91,7 +91,7 @@ export default function ClientCard({ client, onDelete, onEdit, onProgress, onCli
 
   return (
     <div
-      className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 p-4 mb-3 cursor-pointer"
+      className="bg-white rounded-xl shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-200 border border-gray-100 p-4 mb-3 cursor-pointer group"
       onClick={handleCardClick}
     >
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
