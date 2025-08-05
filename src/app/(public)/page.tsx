@@ -2,15 +2,14 @@
 
 import { useState, useEffect } from "react";
 import NextAuthModal from "@/components/auth/NextAuthModal";
-import SessionDebug from "@/components/auth/SessionDebug";
 import { Button } from "@/components/ui/button";
-import { Dumbbell, Users, Calendar, MessageCircle, ArrowUp, Star, Play, CheckCircle, TrendingUp, Clock, Award, Zap, ChevronDown, ChevronUp } from "lucide-react";
+import { Dumbbell, Users, Calendar, MessageCircle, ArrowUp, Star, Play, CheckCircle, TrendingUp, Clock, Award, Zap, ChevronDown, ChevronUp, ArrowRight, Shield, Smartphone, Globe } from "lucide-react";
 
 export default function HomePage() {
   const [showModal, setShowModal] = useState(false);
   const [isArrowVisible, setIsArrowVisible] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [activeFeature, setActiveFeature] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,12 +24,47 @@ export default function HomePage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Автоматическая смена активной функции
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveFeature((prev) => (prev + 1) % 4);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   const scrollToHero = () => {
     const heroSection = document.getElementById("hero-section");
     if (heroSection) {
       heroSection.scrollIntoView({ behavior: "smooth" });
     }
   };
+
+  const features = [
+    {
+      icon: Users,
+      title: "Client Management",
+      description: "Manage your clients, their profiles, and contact information in one place.",
+      color: "blue"
+    },
+    {
+      icon: Dumbbell,
+      title: "Workout Templates", 
+      description: "Create and manage workout templates for different training programs.",
+      color: "green"
+    },
+    {
+      icon: Calendar,
+      title: "Session Scheduling",
+      description: "Schedule training sessions and manage your calendar efficiently.",
+      color: "purple"
+    },
+    {
+      icon: TrendingUp,
+      title: "Progress Tracking",
+      description: "Track your clients' progress with measurements and goal tracking.",
+      color: "orange"
+    }
+  ];
 
   const faqData = [
     {
@@ -54,8 +88,15 @@ export default function HomePage() {
   return (
     <main className="bg-background-white">
       {/* Hero Section */}
-      <section id="hero-section" className="bg-gradient-to-b from-background-white via-purple-50 to-background-light pt-16 sm:pt-20 md:pt-24 lg:pt-32 pb-12 sm:pb-16 md:pb-20">
-        <div className="max-w-5xl mx-auto text-center px-3 sm:px-4 md:px-6">
+      <section id="hero-section" className="bg-gradient-to-b from-background-white via-purple-50 to-background-light pt-16 sm:pt-20 md:pt-24 lg:pt-32 pb-12 sm:pb-16 md:pb-20 relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+          <div className="absolute top-40 left-40 w-80 h-80 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+        </div>
+        
+        <div className="max-w-5xl mx-auto text-center px-3 sm:px-4 md:px-6 relative z-10">
           <div className="flex flex-col items-center gap-4 sm:gap-6 mb-6 sm:mb-8">
             <div className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-main/10 rounded-full flex items-center justify-center mb-3 sm:mb-4 animate-float">
               <Dumbbell className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 text-main" aria-label="TrainerHub Logo Icon" />
@@ -70,9 +111,10 @@ export default function HomePage() {
               <Button
                 size="lg"
                 onClick={() => setShowModal(true)}
-                className="w-full sm:w-auto text-sm sm:text-base md:text-lg px-6 sm:px-8 py-2.5 sm:py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 animate-pulse-glow"
+                className="w-full sm:w-auto text-sm sm:text-base md:text-lg px-6 sm:px-8 py-2.5 sm:py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 animate-pulse-glow group"
               >
-                Sign Up Free
+                Start Free Trial
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button
                 variant="outline"
@@ -83,8 +125,24 @@ export default function HomePage() {
                 }}
                 className="w-full sm:w-auto text-sm sm:text-base md:text-lg px-6 sm:px-8 py-2.5 sm:py-3 font-semibold border-2 hover:bg-main hover:text-white transition-all duration-300 transform hover:scale-105"
               >
-                Learn More
+                See How It Works
               </Button>
+            </div>
+            
+            {/* Trust indicators */}
+            <div className="flex flex-wrap justify-center items-center gap-4 mt-8 text-sm text-secondary animate-fade-in-up">
+              <div className="flex items-center gap-2">
+                <Shield className="h-4 w-4 text-green-500" />
+                <span>Secure & Private</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Smartphone className="h-4 w-4 text-blue-500" />
+                <span>Mobile Friendly</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Globe className="h-4 w-4 text-purple-500" />
+                <span>Cloud Based</span>
+              </div>
             </div>
           </div>
         </div>
@@ -133,42 +191,22 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6">
           <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary text-center mb-8 sm:mb-12 md:mb-14 animate-fade-in-up">Everything You Need</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 text-center hover:shadow-md transition-all duration-300 transform hover:scale-105 animate-fade-in-up">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-main/10 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 animate-float">
-                <Users className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-main" aria-label="Client Management Icon" />
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className={`bg-white rounded-xl shadow-sm p-4 sm:p-6 text-center hover:shadow-md transition-all duration-300 transform hover:scale-105 animate-fade-in-up ${
+                  activeFeature === index ? "ring-2 ring-main" : ""
+                }`}
+              >
+                <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-main/10 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 animate-float">
+                  <feature.icon className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-main" aria-label={`${feature.title} Icon`} />
+                </div>
+                <h3 className="text-base sm:text-lg md:text-xl font-semibold text-primary mb-2">{feature.title}</h3>
+                <p className="text-secondary text-xs sm:text-sm md:text-base leading-relaxed">
+                  {feature.description}
+                </p>
               </div>
-              <h3 className="text-base sm:text-lg md:text-xl font-semibold text-primary mb-2">Client Management</h3>
-              <p className="text-secondary text-xs sm:text-sm md:text-base leading-relaxed">
-                Manage your clients, their profiles, and contact information in one place.
-              </p>
-            </div>
-            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 text-center hover:shadow-md transition-all duration-300 transform hover:scale-105 animate-fade-in-up">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-main/10 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 animate-float">
-                <Dumbbell className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-main" aria-label="Workout Templates Icon" />
-              </div>
-              <h3 className="text-base sm:text-lg md:text-xl font-semibold text-primary mb-2">Workout Templates</h3>
-              <p className="text-secondary text-xs sm:text-sm md:text-base leading-relaxed">
-                Create and manage workout templates for different training programs.
-              </p>
-            </div>
-            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 text-center hover:shadow-md transition-all duration-300 transform hover:scale-105 animate-fade-in-up">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-main/10 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 animate-float">
-                <Calendar className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-main" aria-label="Session Scheduling Icon" />
-              </div>
-              <h3 className="text-base sm:text-lg md:text-xl font-semibold text-primary mb-2">Session Scheduling</h3>
-              <p className="text-secondary text-xs sm:text-sm md:text-base leading-relaxed">
-                Schedule training sessions and manage your calendar efficiently.
-              </p>
-            </div>
-            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 text-center hover:shadow-md transition-all duration-300 transform hover:scale-105 animate-fade-in-up">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-main/10 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 animate-float">
-                <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-main" aria-label="Progress Tracking Icon" />
-              </div>
-              <h3 className="text-base sm:text-lg md:text-xl font-semibold text-primary mb-2">Progress Tracking</h3>
-              <p className="text-secondary text-xs sm:text-sm md:text-base leading-relaxed">
-                Track your clients' progress with measurements and goal tracking.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -304,7 +342,7 @@ export default function HomePage() {
       </footer>
 
       {/* Session Debug */}
-      <SessionDebug />
+      {/* <SessionDebug /> */}
 
       {/* Scroll to Top Arrow */}
       {isArrowVisible && (

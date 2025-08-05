@@ -44,7 +44,7 @@ export default function NextAuthModal({ isOpen, onClose }: NextAuthModalProps) {
         } else {
           onClose();
           toast.success('Login successful!');
-          router.push('/clients');
+          router.push('/dashboard');
         }
       } else {
         // Регистрация через NextAuth
@@ -66,7 +66,7 @@ export default function NextAuthModal({ isOpen, onClose }: NextAuthModalProps) {
         } else {
           onClose();
           toast.success('Registration successful!');
-          const targetPath = formData.role === 'Trainer' ? '/clients' : '/dashboard';
+          const targetPath = formData.role === 'Trainer' ? '/dashboard' : '/dashboard';
           router.push(targetPath);
         }
       }

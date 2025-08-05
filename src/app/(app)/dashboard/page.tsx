@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useApi } from "@/hooks/useApi";
 import { Client, Session } from "@/types/types";
-import { Calendar as CalendarIcon, Users, ArrowUpRight, Plus, TrendingUp } from "lucide-react";
+import { Calendar as CalendarIcon, Users, ArrowUpRight, Plus, TrendingUp, Clock, Target, Award, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { formatDuration } from "@/utils/sessionUtils";
@@ -46,40 +46,41 @@ export default function DashboardPage() {
 
   const activeClients = clients.length;
   const today = new Date();
-          const upcomingSessions = sessions.filter((s: any) => new Date(s.date) >= today);
-        const todaySessions = sessions.filter((s: any) => s.date.startsWith(getTodayISO()));
+  const upcomingSessions = sessions.filter((s: any) => new Date(s.date) >= today);
+  const todaySessions = sessions.filter((s: any) => s.date.startsWith(getTodayISO()));
+  const completedSessions = sessions.filter((s: any) => s.status === 'completed').length;
 
   // Простой расчет тренда (для MVP)
   const clientTrend = activeClients > 0 ? "+3 this month" : "0 this month";
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+          <p className="mt-4 text-gray-600">Loading your dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-          <div>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
+          <div className="animate-fade-in-up">
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-              Welcome back{trainerName ? `, ${trainerName}` : ""}!
+              Welcome back{trainerName ? `, ${trainerName}` : ""}! 👋
             </h1>
             <p className="text-gray-600 text-lg">Here's what's happening with your clients today.</p>
           </div>
-          <div className="flex gap-2">
-            <Button onClick={() => router.push("/calendar?add=true")} className="flex items-center gap-2">
+          <div className="flex gap-2 animate-fade-in-up">
+            <Button onClick={() => router.push("/calendar?add=true")} className="flex items-center gap-2 hover-lift">
               <CalendarIcon className="w-4 h-4" />
               Schedule Session
             </Button>
-            <Button onClick={() => router.push("/clients?add=true")} variant="default" className="flex items-center gap-2">
+            <Button onClick={() => router.push("/clients?add=true")} variant="default" className="flex items-center gap-2 hover-lift">
               <Plus className="w-4 h-4" />
               Add New Client
             </Button>
@@ -87,12 +88,12 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div className="bg-white rounded-xl shadow-lg p-6 border-t-4 border-blue-500 transition hover:shadow-xl hover:-translate-y-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500 transition-all duration-300 hover-lift animate-fade-in-up">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Active Clients</p>
-                <p className="text-4xl font-bold text-gray-900">{activeClients}</p>
+                <p className="text-3xl font-bold text-gray-900">{activeClients}</p>
                 <div className="flex items-center gap-1 mt-2">
                   <ArrowUpRight className="w-4 h-4 text-green-500" />
                   <span className="text-sm text-green-600 font-medium">{clientTrend}</span>
@@ -104,15 +105,43 @@ export default function DashboardPage() {
             </div>
           </div>
           
-          <div className="bg-white rounded-xl shadow-lg p-6 border-t-4 border-green-500 transition hover:shadow-xl hover:-translate-y-1">
+          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500 transition-all duration-300 hover-lift animate-fade-in-up">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Upcoming Sessions</p>
-                <p className="text-4xl font-bold text-gray-900">{upcomingSessions.length}</p>
+                <p className="text-3xl font-bold text-gray-900">{upcomingSessions.length}</p>
                 <p className="text-sm text-gray-500 mt-2">Today: {todaySessions.length}</p>
               </div>
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                 <CalendarIcon className="w-6 h-6 text-green-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500 transition-all duration-300 hover-lift animate-fade-in-up">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Completed Sessions</p>
+                <p className="text-3xl font-bold text-gray-900">{completedSessions}</p>
+                <p className="text-sm text-gray-500 mt-2">This month</p>
+              </div>
+              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                <Award className="w-6 h-6 text-purple-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500 transition-all duration-300 hover-lift animate-fade-in-up">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Success Rate</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {sessions.length > 0 ? Math.round((completedSessions / sessions.length) * 100) : 0}%
+                </p>
+                <p className="text-sm text-gray-500 mt-2">Completion rate</p>
+              </div>
+              <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                <Target className="w-6 h-6 text-orange-600" />
               </div>
             </div>
           </div>
