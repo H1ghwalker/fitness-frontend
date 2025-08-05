@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import NextAuthModal from "@/components/auth/NextAuthModal";
+import SessionDebug from "@/components/auth/SessionDebug";
 import { Button } from "@/components/ui/button";
 import { Dumbbell, Users, Calendar, MessageCircle, ArrowUp, Star, Play, CheckCircle, TrendingUp, Clock, Award, Zap, ChevronDown, ChevronUp } from "lucide-react";
 
@@ -301,6 +302,9 @@ export default function HomePage() {
           <p className="text-secondary text-xs sm:text-sm">©TrainerHub. All rights reserved.</p>
         </div>
       </footer>
+
+      {/* Session Debug */}
+      <SessionDebug />
 
       {/* Scroll to Top Arrow */}
       {isArrowVisible && (

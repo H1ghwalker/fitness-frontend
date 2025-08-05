@@ -18,9 +18,8 @@ export const authOptions: NextAuthOptions = {
 
         try {
           const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337'
-          const endpoint = credentials.name ? '/jwt' : '/jwt'
           
-          const res = await fetch(`${apiUrl}/api/auth${endpoint}`, {
+          const res = await fetch(`${apiUrl}/api/auth/jwt`, {
             method: 'POST',
             headers: { 
               'Content-Type': 'application/json',
@@ -69,20 +68,11 @@ export const authOptions: NextAuthOptions = {
       return session
     },
   },
+  pages: {
+    signIn: '/',
+  },
   session: {
     strategy: "jwt",
   },
-  cookies: {
-    sessionToken: {
-      name: `next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-      },
-    },
-  },
   secret: process.env.NEXTAUTH_SECRET || 'fallback-secret-key',
-  debug: process.env.NODE_ENV === 'development',
 } 

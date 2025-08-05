@@ -36,6 +36,7 @@ export default function NextAuthModal({ isOpen, onClose }: NextAuthModalProps) {
         const result = await signIn('credentials', {
           email: formData.email,
           password: formData.password,
+          callbackUrl: '/clients',
           redirect: false,
         });
 
@@ -43,7 +44,7 @@ export default function NextAuthModal({ isOpen, onClose }: NextAuthModalProps) {
           toast.error('Invalid credentials. Please try again.');
         } else if (result?.ok) {
           onClose();
-          toast.success('Login successful! Redirecting...');
+          toast.success('Login successful!');
           router.push('/clients');
         }
       } else {
@@ -53,6 +54,7 @@ export default function NextAuthModal({ isOpen, onClose }: NextAuthModalProps) {
           password: formData.password,
           name: formData.name,
           role: formData.role,
+          callbackUrl: formData.role === 'Trainer' ? '/clients' : '/dashboard',
           redirect: false,
         });
 
@@ -65,7 +67,7 @@ export default function NextAuthModal({ isOpen, onClose }: NextAuthModalProps) {
           }
         } else if (result?.ok) {
           onClose();
-          toast.success('Registration successful! Redirecting...');
+          toast.success('Registration successful!');
           const targetPath = formData.role === 'Trainer' ? '/clients' : '/dashboard';
           router.push(targetPath);
         }

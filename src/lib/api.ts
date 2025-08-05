@@ -1,4 +1,4 @@
-import { signOut } from 'next-auth/react';
+import { signOut, getSession } from 'next-auth/react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
 
@@ -17,12 +17,14 @@ import {
   Client
 } from '../types/types';
 
-// Функция для получения токена из localStorage (временное решение)
-const getAuthToken = (): string | null => {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('next-auth.access-token');
+// Функция для получения токена из NextAuth сессии
+const getAuthToken = async (): Promise<string | null> => {
+  try {
+    const session = await getSession();
+    return session?.accessToken || null;
+  } catch (error) {
+    return null;
   }
-  return null;
 };
 
 // Универсальная функция для всех API запросов
@@ -50,7 +52,7 @@ const makeRequest = async (endpoint: string, options: RequestInit & { params?: R
 
   try {
     // Получаем токен для авторизации
-    const token = getAuthToken();
+    const token = await getAuthToken();
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     
     // Добавляем токен авторизации если есть
